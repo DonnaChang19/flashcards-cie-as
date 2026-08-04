@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase (keep free project alive)
-        run: curl -s -o /dev/null -w "%{http_code}" "https://nhceunbblvyoepzdjrny.supabase.co/rest/v1/decks?select=slug&limit=1"
+        run: curl -s -o /dev/null -w "%{http_code}" -H "apikey: sb_publishable_4icajuvqUIziuH9KMjMwGg_XB3nw8lg" -H "Authorization: Bearer sb_publishable_4icajuvqUIziuH9KMjMwGg_XB3nw8lg" "https://nhceunbblvyoepzdjrny.supabase.co/rest/v1/decks?select=slug&limit=1"
