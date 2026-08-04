@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>CIE-AS核心定义和单词卡</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#6b7686;
+    --line:#e6eaf2; --brand:#4f6ef7; --brand2:#19b8a6;
+    --warn:#e8833a; --bad:#e0524e; --good:#27a567; --soft:#eef2ff;
+    --shadow:0 10px 30px rgba(31,39,51,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation; overscroll-behavior:none
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+  header.top{
+    background:linear-gradient(120deg,#4f6ef7,#19b8a6);color:#fff;border-radius:18px;
+    padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  header.top h1{margin:0;font-size:21px;letter-spacing:.3px}
+  header.top .sub{opacity:.9;font-size:13px;margin-top:4px}
+  .toprow{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+    padding:6px 12px;border-radius:999px;font-size:13px;display:flex;align-items:center;gap:6px}
+  .pill b{font-size:15px}
+  .tabs{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+  .tab{appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:9px 16px;border-radius:12px;font-size:14px;cursor:pointer;transition:.15s;font-weight:600}
+  .tab:hover{border-color:#c9d2e6}
+  .tab.active{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 6px 16px rgba(79,110,247,.3)}
+  .panel{display:none;background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .panel.active{display:block}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{appearance:none;border:none;border-radius:12px;padding:11px 18px;font-size:14px;
+    font-weight:700;cursor:pointer;transition:.15s;background:var(--brand);color:#fff}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.ghost{background:#fff;color:var(--brand);border:1px solid #c9d2e6}
+  .btn.soft{background:var(--soft);color:var(--brand)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.bad{background:var(--bad)} .btn.warn{background:var(--warn)} .btn.good{background:var(--good)}
+  select,input[type=text]{font:inherit;padding:9px 12px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;color:var(--ink)}
+  /* flip card */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0}
+  .progress{width:100%;height:8px;background:#eef1f7;border-radius:99px;overflow:hidden}
+  .progress>i{display:block;height:100%;background:linear-gradient(90deg,#4f6ef7,#19b8a6);width:0;transition:.3s}
+  .flip{width:100%;max-width:620px;height:300px;perspective:1400px;cursor:pointer}
+  .flip-in{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d}
+  .flip.flipped .flip-in{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;
+    display:flex;align-items:center;justify-content:center;padding:26px;text-align:center;
+    box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden}
+  .front{background:linear-gradient(135deg,#ffffff,#eef3ff)}
+  .front .term{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:.3px}
+  .front .hint{position:absolute;bottom:14px;left:0;right:0;font-size:12px;color:var(--muted)}
+  .back{background:linear-gradient(135deg,#ffffff,#eafff8);transform:rotateY(180deg);
+    flex-direction:column;justify-content:flex-start;padding-top:42px;padding-bottom:42px}
+  .back .def{font-size:18px;color:#243;line-height:1.7;width:100%;flex:1;min-height:0;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;user-select:none;-webkit-user-select:none}
+  .back .tag{position:absolute;top:12px;left:14px;font-size:12px;color:var(--muted)}
+  .back .meta{position:absolute;bottom:12px;left:0;right:0;font-size:12px;color:var(--muted)}
+  /* 挖空练习 */
+  .cloze-card{width:100%;max-width:620px;min-height:300px;border-radius:18px;position:relative;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    padding:52px 26px 60px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--line);
+    background:linear-gradient(135deg,#ffffff,#fff7ea)}
+  .cloze-card .ctag{position:absolute;top:12px;left:14px;font-size:12px;color:var(--muted)}
+  .cloze-card .cterm{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:.3px}
+  .cloze-card .cloze-def{font-size:17px;color:#243;line-height:1.8;width:100%;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .cloze-card .cmeta{position:absolute;bottom:32px;left:0;right:0;font-size:12px;color:var(--muted)}
+  .cloze-card .chint{position:absolute;bottom:12px;left:0;right:0;font-size:12px;color:var(--muted)}
+  .cloze{display:inline-block;min-width:64px;padding:0 6px;border-bottom:2px solid #e39a2d;
+    color:#e39a2d;font-weight:800;letter-spacing:2px;border-radius:4px;background:#fff3dd}
+  .cloze.revealed{color:#0f766e;background:#e3fff6;border-bottom-color:#19b8a6;letter-spacing:.3px}
+  @media(max-width:560px){.cloze-card .cloze-def{font-size:15px}.cloze-card .cterm{font-size:20px}}
+  .ratings{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .ratings .btn{min-width:120px}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px}
+  .empty .big{font-size:40px;margin-bottom:8px}
+  /* stats */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{background:#fafbff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .stat .n{font-size:26px;font-weight:800}
+  .stat .l{font-size:13px;color:var(--muted)}
+  .donut-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .legend{display:flex;flex-direction:column;gap:8px;font-size:14px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:middle}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:10px}
+  .bars .b{flex:1;background:var(--brand);border-radius:6px 6px 0 0;min-height:3px;position:relative}
+  .bars .b span{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;color:var(--muted)}
+  .bars .b small{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted)}
+  /* calendar */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:360px;margin-top:10px}
+  .cal .d{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;background:#f3f5fa;color:var(--muted);border:1px solid transparent}
+  .cal .d.on{background:var(--brand);color:#fff;font-weight:700}
+  .cal .d.today{outline:2px solid var(--brand2)}
+  .cal .h{background:none;color:var(--muted);font-weight:700;font-size:12px}
+  /* browse */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .chip{appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer}
+  .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;transition:.15s}
+  .item:hover{border-color:#c9d2e6}
+  .item .t{font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .item .dd{display:none;margin-top:8px;color:#334;font-size:14px;line-height:1.6}
+  .item.open .dd{display:block}
+  .lvl{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--brand);font-weight:700}
+  .lvl.m{background:#e7f8ef;color:var(--good)}
+  .lvl.l{background:#fff1e8;color:var(--warn)}
+  .lvl.n{background:#eef1f7;color:var(--muted)}
+  .sum{text-align:center;padding:24px}
+  .sum .big{font-size:34px;font-weight:800;color:var(--brand)}
+  .chkline{margin-top:8px;font-size:15px;color:var(--brand);font-weight:600}
+  .pill.good{background:#19b8a6;color:#fff;border-color:#19b8a6}
+  .pill.idle{background:#f0f0f0;color:#888;border-color:#e2e2e2}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:6px}
+  .chcard{text-align:left;cursor:pointer;background:#fff;border:1px solid #e6e8ef;border-radius:14px;
+    padding:13px 15px;transition:.15s;display:flex;flex-direction:column;gap:5px}
+  .chcard:hover{border-color:var(--brand);box-shadow:0 4px 14px rgba(25,184,166,.15);transform:translateY(-2px)}
+  .chcard .chn{font-size:12px;font-weight:700;color:var(--brand);letter-spacing:.3px}
+  .chcard .cht{font-size:14px;font-weight:700;color:#1f2733;line-height:1.35;min-height:38px}
+  .chcard .chmeta{font-size:11.5px;color:var(--muted)}
+  .chbar{height:6px;border-radius:99px;background:#eef1f7;overflow:hidden}
+  .chbar>i{display:block;height:100%;background:var(--brand);border-radius:99px}
+  @media(max-width:560px){.chgrid{grid-template-columns:1fr 1fr;gap:9px}.chcard{padding:11px 12px}.chcard .cht{font-size:13px;min-height:34px}}
+  /* 学习方式选择 */
+  .moderow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .modecard{text-align:left;cursor:pointer;background:#fff;border:1px solid #e6e8ef;border-radius:16px;padding:18px 20px;transition:.15s;display:flex;flex-direction:column;gap:7px}
+  .modecard:hover{border-color:var(--brand);box-shadow:0 6px 18px rgba(79,110,247,.15);transform:translateY(-2px)}
+  .modecard .mi{font-size:30px;line-height:1}
+  .modecard .mn{font-size:17px;font-weight:800;color:#1f2733}
+  .modecard .md{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .countrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:6px}
+  .backbtn{margin-bottom:12px}
+  @media(max-width:560px){.moderow{grid-template-columns:1fr}}
+  @media(max-width:560px){.front .term{font-size:24px}.back .def{font-size:16px}.flip{height:260px}.back{padding-top:38px;padding-bottom:38px}}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1f2733;color:#fff;
+    padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+  .small{font-size:12px}
+  a.link{color:var(--brand);cursor:pointer}
+  /* 复习入口卡 */
+  .revopt{background:#fff;border:1px solid #e6e8ef;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+  .revopt .rt{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .revopt .rt .name{font-size:15px;font-weight:800;color:#1f2733}
+  .revopt .rt .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .revopt .rt .tag.auto{background:#e6f7f4;color:#0f9c8b}
+  .revopt .rt .tag.pick{background:#fff1e8;color:var(--warn)}
+  .revopt .desc{font-size:12.5px;color:var(--muted);margin:6px 0 10px;line-height:1.5}
+  .revopt .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+@media(max-width:560px){.btn{min-height:46px}.chcard{min-height:52px}.ratings .btn{flex:1;min-width:120px}}
+</style>
+<script>window.DECK_SLUG = "vwords";</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="cloudstore.js"></script>
+<script src="auth.js"></script>
+<script src="sync.js"></script>
+<script src="update-notify.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>CIE-AS核心定义和单词卡</h1>
+    <div class="sub">根据 CIE-AS 阶段核心定义整理 · 共 <span id="totalN">0</span> 张单词卡</div>
+    <div class="sub" style="margin-top:3px;opacity:.8">制作：常亚菲 Donna</div>
+    <div class="toprow">
+      <div class="pill">今日 <b id="todayStr">-</b></div>
+      <div class="pill">连续打卡 <b id="streakN">0</b> 天</div>
+      <div class="pill">待复习 <b id="dueN">0</b> 张</div>
+      <div class="pill">已掌握 <b id="masterN">0</b> 张</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="study">学习</button>
+    <button class="tab" data-tab="review">复习</button>
+    <button class="tab" data-tab="checkin">打卡</button>
+    <button class="tab" data-tab="stats">统计</button>
+    <button class="tab" data-tab="browse">词库</button>
+  </div>
+
+  <!-- STUDY — 两级导航：选方式 → 选章节/选个数 → 学习 -->
+  <section class="panel active" id="p-study">
+    <!-- 第 0 级：选择学习方式 -->
+    <div id="studyModeSel">
+      <div class="muted small" style="margin-bottom:10px">选择学习方式</div>
+      <div class="moderow">
+        <button class="modecard" data-mode="chapter">
+          <div class="mi">📚</div>
+          <div class="mn">按章节学习</div>
+          <div class="md">按教材章节一篇一篇背，适合系统过一遍；点开某个章节只显示该章闪卡</div>
+        </button>
+        <button class="modecard" data-mode="count">
+          <div class="mi">🔢</div>
+          <div class="mn">按个数学习</div>
+          <div class="md">自选本轮张数（20 / 30 / 40 / 50），系统优先抽取尚未掌握的单词</div>
+        </button>
+        <button class="modecard" data-mode="cloze">
+          <div class="mi">✏️</div>
+          <div class="mn">挖空练习</div>
+          <div class="md">定义里的重要术语被挖空，看上下文回忆该词；可按时/按章练习，进度独立记录</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 第 1 级：按章节 -->
+    <div id="studyChapter" style="display:none">
+      <button class="btn ghost backbtn" onclick="backToMode()">← 返回选择学习方式</button>
+      <div class="muted small" style="margin-bottom:10px">按章节学习 · 点击任意章节，学习该章全部单词（进度条=已学比例）</div>
+      <div class="chgrid" id="chapterGrid"></div>
+    </div>
+
+    <!-- 第 1 级：按个数 -->
+    <div id="studyCount" style="display:none">
+      <button class="btn ghost backbtn" onclick="backToMode()">← 返回选择学习方式</button>
+      <div class="muted small" style="margin-bottom:10px">按个数学习 · 选择本轮学习的张数，系统优先抽取尚未掌握的单词</div>
+      <div class="countrow">
+        <button class="modecard" data-count="20"><div class="mi">20</div><div class="mn">20 张</div><div class="md">随机抽 20 张</div></button>
+        <button class="modecard" data-count="30"><div class="mi">30</div><div class="mn">30 张</div><div class="md">随机抽 30 张</div></button>
+        <button class="modecard" data-count="40"><div class="mi">40</div><div class="mn">40 张</div><div class="md">随机抽 40 张</div></button>
+        <button class="modecard" data-count="50"><div class="mi">50</div><div class="mn">50 张</div><div class="md">随机抽 50 张</div></button>
+      </div>
+    </div>
+
+    <!-- 第 2 级：学习会话 -->
+    <div id="studyArea" style="display:none;margin-top:14px"></div>
+  </section>
+
+  <!-- REVIEW — 两级：复习选项菜单 → 会话 -->
+  <section class="panel" id="p-review">
+    <div id="reviewMenu">
+      <div class="grid" style="margin-bottom:14px">
+        <div class="stat"><div class="n" id="rDue">0</div><div class="l">今日待复习</div></div>
+        <div class="stat"><div class="n" id="rNew">0</div><div class="l">未学新词</div></div>
+        <div class="stat"><div class="n" id="rWeak">0</div><div class="l">薄弱词</div></div>
+      </div>
+      <!-- 复习待办：系统自动生成，全部做完 -->
+      <div class="revopt">
+        <div class="rt">
+          <span class="name">复习待办</span>
+          <span class="tag auto">系统自动安排</span>
+        </div>
+        <div class="desc">按艾宾浩斯遗忘曲线，把<b>今天到期的卡片</b>自动挑出来（<b id="revDueN">0</b> 张），<b>无需自己选个数，一次全部复习完</b>——这才是防遗忘的关键。做完今天就清零。</div>
+        <div class="actions">
+          <button class="btn" id="revDue">复习全部到期（<span id="revDueN2">0</span> 张）</button>
+        </div>
+      </div>
+
+      <!-- 专攻薄弱：主动加练，自选个数 -->
+      <div class="revopt">
+        <div class="rt">
+          <span class="name">专攻薄弱</span>
+          <span class="tag pick">主动加练 · 自选数量</span>
+        </div>
+        <div class="desc">在到期任务之外<b>额外加练</b>那些还没记牢的词（易错、掌握度低），<b>不管到没到期</b>。因为是主动补练，可自己定本轮做几张。</div>
+        <div class="actions">
+          <span class="muted small">本轮数量：</span>
+          <select id="sessionSize2">
+            <option value="10">10 张</option>
+            <option value="20" selected>20 张</option>
+            <option value="30">30 张</option>
+            <option value="40">40 张</option>
+            <option value="50">50 张</option>
+          </select>
+          <button class="btn soft" id="revWeak">开始专攻（<span id="revWeakN">0</span> 张薄弱）</button>
+        </div>
+      </div>
+
+      <!-- 全部过一遍：通盘复习，自选个数 -->
+      <div class="revopt">
+        <div class="rt">
+          <span class="name">全部过一遍</span>
+          <span class="tag pick">通盘复习 · 自选数量</span>
+        </div>
+        <div class="desc">不分到期与否，从<b>全部单词</b>里随机抽题通盘复习（如考前扫一遍）。数量沿用上面「本轮数量」的设置。</div>
+        <div class="actions">
+          <button class="btn ghost" id="revAll">开始通盘复习</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="reviewArea" style="display:none;margin-top:14px"></div>
+  </section>
+
+  <!-- CHECKIN -->
+  <section class="panel" id="p-checkin">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <div style="font-size:15px;font-weight:700">每日打卡</div>
+        <div class="muted small">完成学习后自动打卡，本页仅查看记录</div>
+      </div>
+      <div class="pill idle" id="todayChk">今日未打卡</div>
+    </div>
+    <div class="grid" style="margin:16px 0">
+      <div class="stat"><div class="n" id="cCur">0</div><div class="l">当前连续</div></div>
+      <div class="stat"><div class="n" id="cBest">0</div><div class="l">最长连续</div></div>
+      <div class="stat"><div class="n" id="cTot">0</div><div class="l">累计打卡</div></div>
+    </div>
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn ghost" style="font-size:12px;padding:6px 11px" onclick="calPrev()">‹ 上月</button>
+      <div class="row" style="gap:8px;align-items:center">
+        <div class="muted small" id="calTitle" style="font-weight:700;font-size:14px"></div>
+        <a class="link" style="font-size:12px" onclick="calToday()">回到本月</a>
+      </div>
+      <button class="btn ghost" style="font-size:12px;padding:6px 11px" onclick="calNext()">下月 ›</button>
+    </div>
+    <div class="cal" id="cal"></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="panel" id="p-stats">
+    <div class="grid">
+      <div class="stat"><div class="n" id="sNew">0</div><div class="l">新词</div></div>
+      <div class="stat"><div class="n" id="sLearn">0</div><div class="l">学习中</div></div>
+      <div class="stat"><div class="n" id="sMaster">0</div><div class="l">已掌握</div></div>
+      <div class="stat"><div class="n" id="sDue">0</div><div class="l">待复习</div></div>
+      <div class="stat"><div class="n" id="sRet">100%</div><div class="l">已学平均留存率</div></div>
+    </div>
+    <h3 style="margin:18px 0 6px">掌握度分布</h3>
+    <div class="donut-wrap">
+      <svg id="donut" width="140" height="140" viewBox="0 0 140 140"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+    <h3 style="margin:18px 0 6px">近 14 天学习量</h3>
+    <div class="bars" id="actBars"></div>
+    <h3 style="margin:20px 0 6px">记忆留存（艾宾浩斯遗忘曲线）</h3>
+    <div class="row" style="gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px">
+        <div class="muted small">系统按遗忘曲线排期：记忆随天数指数衰减，留存跌到约 90% 时（绿点）自动安排复习，记牢后间隔越拉越长。</div>
+      </div>
+      <div class="donut-wrap">
+        <svg id="retCurve" width="100%" style="max-width:340px"></svg>
+      </div>
+    </div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn ghost" id="exportBtn">导出进度</button>
+      <button class="btn ghost" id="importBtn">导入进度</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+      <button class="btn ghost" id="resetBtn">重置进度</button>
+    </div>
+    <div class="muted small" style="margin-top:8px">进度仅保存在本设备浏览器中；换设备请用“导出/导入”备份。</div>
+  </section>
+
+  <!-- BROWSE -->
+  <section class="panel" id="p-browse">
+    <div class="row" style="margin-bottom:12px">
+      <input type="text" id="search" placeholder="搜索单词…" style="flex:1;min-width:160px">
+    </div>
+    <div class="filters" id="bFilters">
+      <button class="chip active" data-f="all">全部</button>
+      <button class="chip" data-f="new">新词</button>
+      <button class="chip" data-f="learn">学习中</button>
+      <button class="chip" data-f="master">已掌握</button>
+      <button class="chip" data-f="due">待复习</button>
+    </div>
+    <div class="list" id="bList"></div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = [{"id":"v001","term":"Needs","def":"the demand for something that is essential for survival, such as food or shelter.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"the [[demand for something]] that is essential for survival, such as [[food]] or [[shelter]]."},{"id":"v002","term":"Wants","def":"the demand for something that is not essential for survival such as a new car, and which is not necessarily achieved by a consumer.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"the [[demand for something]] that is [[not essential]] for survival such as a new car, and which is [[not necessarily achieved]] by a consumer."},{"id":"v003","term":"Scarcity","def":"a condition where there are insufficient resources to satisfy all the needs and wants of people.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"a [[condition]] where there are [[insufficient]] resources to [[satisfy]] all the needs and wants of people."},{"id":"v004","term":"Choice","def":"the need to make decisions about the possible alternative uses of scarce resources, given the existence of limited resources and unlimited needs and wants.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"the need to make decisions about the [[possible alternative]] uses of scarce resources, given the [[existence]] of limited resources and [[unlimited needs]] and wants."},{"id":"v005","term":"Opportunity cost","def":"it indicates the benefits that could have been obtained by choosing the next best alternative.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"it [[indicates]] the benefits that could have been obtained by [[choosing]] the [[next best alternative]]."},{"id":"v006","term":"The basic questions of resource allocation","def":"What to produce? How to produce? For whom to produce?.","chNum":1,"chTitle":"Scarcity, choice and opportunity cost","cloze":"[[What]] to produce? How to produce? For whom to produce?."},{"id":"v007","term":"Positive statement","def":"an objective statement that is based on factual evidence, which can be tested by facts.","chNum":2,"chTitle":"Economic methodology","cloze":"an [[objective statement]] that is based on [[factual evidence]], which can be tested by facts."},{"id":"v008","term":"Normative statement","def":"a subjective statement that is based upon beliefs rather than factual evidence, which cannot be tested by facts.","chNum":2,"chTitle":"Economic methodology","cloze":"a [[subjective statement]] that is based upon [[beliefs]] rather than [[factual evidence]], which cannot be tested by facts."},{"id":"v009","term":"Ceteris paribus","def":"iterally “all other things being equal”, i.e. the other factors which could influence a relationship between two variables are assumed to remain constant.","chNum":2,"chTitle":"Economic methodology","cloze":"iterally “all other things being [[equal”, i.e]]. the other factors which could influence a [[relationship between two variables]] are assumed to [[remain constant]]."},{"id":"v010","term":"Short run","def":"a period of time in which at least one factor of production is fixed in supply, and output can only be increased by using more of the variable factors.","chNum":2,"chTitle":"Economic methodology","cloze":"a period of time in which at least one factor of production is [[fixed]] in supply, and [[output]] can only be increased by using more of the [[variable]] factors."},{"id":"v011","term":"Long run","def":"a period of time when all factors are variable and output can be increased by using more of all factors.","chNum":2,"chTitle":"Economic methodology","cloze":"a period of time when all factors are [[variable]] and [[output]] can be [[increased]] by using more of all factors."},{"id":"v012","term":"Very long run","def":"a period of time when technical progress is taking place, affecting the ability of firms to supply. In the other two time periods, the technical progress is held constant.","chNum":2,"chTitle":"Economic methodology","cloze":"a period of time when technical progress is [[taking place, affecting]] the ability of firms to [[supply]]. In the other [[two time periods]], the technical progress is held constant."},{"id":"v013","term":"Resources","def":"the inputs used to produce goods and services.","chNum":3,"chTitle":"Factors of production","cloze":"the [[inputs]] used to produce goods and services."},{"id":"v014","term":"Land","def":"the factor of production that is concerned with the natural resources of an economy, such as farmland or mineral deposits.","chNum":3,"chTitle":"Factors of production","cloze":"the factor of production that is [[concerned]] with the [[natural]] resources of an economy, such as farmland or [[mineral deposits]]."},{"id":"v015","term":"Labour","def":"the factor of production that is concerned with the workforce of an economy in terms of both the physical and mental effort involved in production.","chNum":3,"chTitle":"Factors of production","cloze":"the factor of production that is concerned with the [[workforce]] of an economy in terms of both the [[physical]] and [[mental effort involved]] in production."},{"id":"v016","term":"Capital","def":"the factor of production that relates to the human-made aids to production.","chNum":3,"chTitle":"Factors of production","cloze":"the factor of production that [[relates]] to the [[human]]-made [[aids]] to production."},{"id":"v017","term":"Enterprise","def":"the factor of production that takes a risk in organising the other three factors of production.","chNum":3,"chTitle":"Factors of production","cloze":"the factor of production that [[takes]] a [[risk]] in [[organising]] the other three factors of production."},{"id":"v018","term":"Human capital","def":"the human aspect of production, including the talent, knowledge, abilities, training, education and skills of a labour force.","chNum":3,"chTitle":"Factors of production","cloze":"the human aspect of production, including the talent, [[knowledge, abilities, training, education]] and skills of a [[labour force]]."},{"id":"v019","term":"Physical capital","def":"the non-human resources used in production, including tools, equipment, buildings and machinery.","chNum":3,"chTitle":"Factors of production","cloze":"the [[non-human]] resources used in production, including [[tools, equipment, buildings]] and machinery."},{"id":"v020","term":"Specialisation","def":"the process by which individuals, firms, regions and whole economies concentrate on producing those products in which they have an advantage.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the process by which individuals, firms, [[regions]] and whole economies [[concentrate]] on [[producing]] those products in which they have an advantage."},{"id":"v021","term":"Division of labour","def":"the process whereby workers specialise in, or concentrate on, particular tasks.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the process [[whereby workers specialise]] in, or concentrate on, particular [[tasks]]."},{"id":"v022","term":"Economic system","def":"the way in which a particular country attempts to answer the basic economic problem.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the way in which a particular [[country attempts]] to [[answer]] the basic economic [[problem]]."},{"id":"v023","term":"Allocative mechanism","def":"the method by which scarce economic resources are allocated between alternative uses.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the [[method]] by which scarce economic resources are [[allocated]] between [[alternative]] uses."},{"id":"v024","term":"Market","def":"a means of bringing together buyers and sellers to exchange products. A market can exist in a physical sense, but it can also be used to refer to an exchange of goods and services through the internet or by telephone.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"a means of [[bringing together buyers]] and sellers to [[exchange]] products. A market can exist in a physical sense, but it can also be used to refer to an [[exchange]] of goods and services through the internet or by telephone."},{"id":"v025","term":"Market economy","def":"also known as a market system, this is the type of economic system where decisions about the allocation of resources are taken in the private sector by producers and consumers.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"also [[known]] as a market system, this is the type of economic system where [[decisions about]] the allocation of resources are taken in the [[private]] sector by producers and consumers."},{"id":"v026","term":"Price mechanism","def":"the process by which changes in price (resulting from changes in demand and/or supply) bring about changes in the allocation of resources in a market economy.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the process by which changes in [[price (resulting]] from changes in [[demand]] and/or [[supply) bring about]] changes in the allocation of resources in a market economy."},{"id":"v027","term":"Planned economy","def":"the type of economic system, also known as a command economy, where decisions about the allocation of resources are taken by the state or by government agencies.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the type of economic system, also known as a [[command]] economy, where decisions about the allocation of resources are taken by the [[state]] or by government [[agencies]]."},{"id":"v028","term":"Mixed economy","def":"the type of economic system where decisions about the allocation of resources are taken in both the private sector and the public sector.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"the type of economic system where [[decisions about]] the allocation of resources are taken in both the [[private]] sector and the [[public]] sector."},{"id":"v029","term":"Transitional economy","def":"an economy that is in the process of changing from a planned economy to more of a mixed economy where market forces have greater importance.","chNum":4,"chTitle":"Resource allocation in different economic systems","cloze":"an economy that is in the process of [[changing]] from a [[planned]] economy to more of a mixed economy where market forces have [[greater importance]]."},{"id":"v030","term":"Production possibility curve","def":"a curve that joins together the different combinations of products that can be produced in an economy over a particular period of time given the existing resources and level of technology available. It can also be called a production possibility frontier or a production possibility boundary.","chNum":5,"chTitle":"Production possibility curves","cloze":"a curve that joins together the different combinations of products that can be produced in an economy over a particular period of time given the existing resources and level of [[technology available]]. It can also be called a production [[possibility frontier]] or a production [[possibility boundary]]."},{"id":"v031","term":"Microeconomics","def":"that part of the subject of Economics that is concerned with the decisions of particular firms or individuals.","chNum":5,"chTitle":"Production possibility curves","cloze":"that part of the [[subject]] of Economics that is [[concerned]] with the [[decisions]] of particular firms or individuals."},{"id":"v032","term":"Macroeconomics","def":"that part of the subject of Economics that is concerned with the whole economy.","chNum":5,"chTitle":"Production possibility curves","cloze":"that part of the [[subject]] of Economics that is [[concerned]] with the [[whole]] economy."},{"id":"v033","term":"The law of diminishing returns","def":"as extra units of a resource, or input, are used in the production process, there will be increases in output, but there will be successively smaller increases in output as more inputs are added.","chNum":5,"chTitle":"Production possibility curves","cloze":"as extra units of a resource, or input, are used in the production process, there will be increases in [[output, but]] there will be [[successively smaller increases]] in [[output]] as more inputs are added."},{"id":"v034","term":"Free good","def":"a good which is not scarce and so therefore does not need a mechanism to allocate it. The opportunity cost of producing the product is zero.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a good which is [[not scarce]] and so [[therefore does not need]] a mechanism to allocate it. The [[opportunity cost]] of producing the product is zero."},{"id":"v035","term":"Economic good","def":"a good that is relatively scarce and so will need to be allocated to a particular use in some way through an allocative mechanism.The opportunity cost of producing the product is not zero.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a good that is [[relatively scarce]] and so will need to be allocated to a particular use in some way through an [[allocative mechanism]].The [[opportunity cost]] of producing the product is not zero."},{"id":"v036","term":"Rival","def":"a rival good is one where if one person consumes a good there is less available or others.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a rival good is one where if one person [[consumes]] a good there is [[less available]] or [[others]]."},{"id":"v037","term":"Excludable","def":"a situation that exists when a price is charged for a good. It will be excluded from those who are unable and/or unwilling to pay this price.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a situation that exists when a [[price is charged]] for a good. It will be excluded from those who are unable and/or [[unwilling]] to [[pay this price]]."},{"id":"v038","term":"Public good","def":"a good which has the two characteristics of being “non-rival” and “non-excludable ”, by which cannot be provided in a free market.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a good which has the [[two characteristics]] of being “non-rival” and “[[non-excludable]] ”, by which cannot be provided in a [[free market]]."},{"id":"v039","term":"Non-rivalrous or non-rival","def":"if one person consumes a product, it does not reduce the extent of its availability to other people.","chNum":6,"chTitle":"Classification of goods and services","cloze":"if one person [[consumes]] a product, it [[does not reduce]] the extent of its [[availability]] to other people."},{"id":"v040","term":"Non-excludability or non- excludable:","def":"if a public good is produced, it is not possible to exclude any person from its use.","chNum":6,"chTitle":"Classification of goods and services","cloze":"if a [[public good]] is produced, it is [[not possible]] to [[exclude]] any person from its use."},{"id":"v041","term":"Free rider","def":"a person who has no incentive to pay for the use of a public good because there can be consumption without any payment being made.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a person who has [[no incentive]] to pay for the use of a [[public good]] because there can be [[consumption]] without any payment being made."},{"id":"v042","term":"Non-rejectability","def":"the idea that certain public goods can not be rejected, such as the police force or the armed forces of a country.","chNum":6,"chTitle":"Classification of goods and services","cloze":"the idea that certain [[public goods can not]] be rejected, such as the [[police force]] or the [[armed forces]] of a country."},{"id":"v043","term":"Imperfect information","def":"a situation in which people, including both producers and consumers, do not have the full information needed to make ratioal decisions, reducing the extent of efficiency.","chNum":6,"chTitle":"Classification of goods and services","cloze":"a situation in which people, including both producers and consumers, do not have the [[full information needed]] to make [[ratioal decisions, reducing]] the extent of [[efficiency]]."},{"id":"v044","term":"Merit good","def":"a product which would be under-produced and under-consumed in a market economy as a result of the imperfect information held by consumers (who do not fully understand how beneficial it is).","chNum":6,"chTitle":"Classification of goods and services","cloze":"a product which would be under-produced and under-[[consumed]] in a market economy as a result of the [[imperfect information held]] by consumers (who do not [[fully understand how beneficial]] it is)."},{"id":"v045","term":"Demerit good","def":"a product which would be over-produced and over-consumed in a market economy as a result of the imperfect information held by consumers (who do not fully understand how harmful it is).","chNum":6,"chTitle":"Classification of goods and services","cloze":"a product which would be over-produced and over-[[consumed]] in a market economy as a result of the [[imperfect information held]] by consumers (who do not [[fully understand how harmful]] it is)."},{"id":"v046","term":"Effective demand","def":"the quantity of a good or service an individual is willing and able to purchase over a range of prices over a period of time.","chNum":7,"chTitle":"Demand and supply curves","cloze":"the [[quantity]] of a good or service an individual is willing and able to [[purchase]] over a range of [[prices]] over a period of time."},{"id":"v047","term":"Law of demand","def":"for most goods and services the quantity demanded varies inversely with its price.","chNum":7,"chTitle":"Demand and supply curves","cloze":"for most goods and services the [[quantity demanded varies inversely]] with its price."},{"id":"v048","term":"Demand curve","def":"a curve showing the relationship between the quantity of a product individuals are willing and able to buy over a range of prices over a period of time, on the assumption that all other factors affecting demand are held constant.","chNum":7,"chTitle":"Demand and supply curves","cloze":"a curve showing the relationship between the [[quantity]] of a product individuals are willing and able to buy over a range of [[prices]] over a period of time, on the assumption that all other factors [[affecting demand]] are held constant."},{"id":"v049","term":"Supply curve","def":"a curve showing the relationship between the quantity of a product producers are willing and able to offer for sale over a range of prices over a period of time, on the assumption that all other factors affecting supply are held constant.","chNum":7,"chTitle":"Demand and supply curves","cloze":"a curve showing the relationship between the [[quantity]] of a product producers are willing and able to offer for sale over a range of [[prices]] over a period of time, on the assumption that all other factors [[affecting supply]] are held constant."},{"id":"v050","term":"Market demand","def":"the total demand for a particular product in the market.","chNum":7,"chTitle":"Demand and supply curves","cloze":"the [[total demand]] for a particular product in the market."},{"id":"v051","term":"Supply","def":"the quantity of a good a producer is willing and able to offer for sale over a range of prices over a given period of time.","chNum":7,"chTitle":"Demand and supply curves","cloze":"the [[quantity]] of a good a producer is [[willing]] and able to offer for sale over a range of [[prices]] over a given period of time."},{"id":"v052","term":"Law of supply","def":"for most goods and services the quantity supplied will increase as price rises and decrease as price falls.","chNum":7,"chTitle":"Demand and supply curves","cloze":"for most goods and services the [[quantity supplied]] will increase as [[price rises]] and decrease as [[price falls]]."},{"id":"v053","term":"Inferior good","def":"a good whose demand falls as income rises and rises as income falls.","chNum":7,"chTitle":"Demand and supply curves","cloze":"a [[good whose demand falls]] as [[income]] rises and rises as income falls."},{"id":"v054","term":"Normal good","def":"a good whose demand rises as income rises and falls as income falls.","chNum":7,"chTitle":"Demand and supply curves","cloze":"a [[good whose demand rises]] as [[income]] rises and falls as income falls."},{"id":"v055","term":"Substitutes","def":"goods that are alternatives for one another.","chNum":7,"chTitle":"Demand and supply curves","cloze":"goods that are [[alternatives]] for one another."},{"id":"v056","term":"Complements","def":"goods that are consumed together.","chNum":7,"chTitle":"Demand and supply curves","cloze":"goods that are [[consumed]] together."},{"id":"v057","term":"Elasticity","def":"the responsiveness of demand or supply to a change in one of its determinants.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the responsiveness of [[demand or supply]] to a change in one of its [[determinants]]."},{"id":"v058","term":"Price elasticity of demand","def":"the responsiveness of demand for a product to a change in its price.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the [[responsiveness of demand]] for a product to a change in its price."},{"id":"v059","term":"Income elasticity of demand","def":"the responsiveness of demand for a product to a change in consumers’ income.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the [[responsiveness of demand]] for a product to a change in consumers’ income."},{"id":"v060","term":"Cross price elasticity of demand","def":"the responsiveness of the demand for one product to a change in the price of another.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the [[responsiveness of the demand]] for one product to a change in the price of another."},{"id":"v061","term":"Elastic demand","def":"the proportionate (percentage) change in demand is greater than the proportionate (percentage) change in price.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the proportionate (percentage) change in [[demand is greater]] than the proportionate ([[percentage) change in price]]."},{"id":"v062","term":"Inelastic demand","def":"the proportionate (percentage) change in demand is less than the proportionate (percentage) change in price.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"the proportionate (percentage) change in [[demand is less]] than the proportionate ([[percentage) change in price]]."},{"id":"v063","term":"Indirect tax","def":"a tax on expenditure which is levied on the producer, but may then be passed on to consumers through an increase in price.","chNum":8,"chTitle":"Price elasticity, income elasticity and cross elasticity of demand","cloze":"a [[tax on expenditure]] which is levied on the producer, but may then be [[passed]] on to consumers through an increase in [[price]]."},{"id":"v064","term":"Price elasticity of supply","def":"the responsiveness of the quantity supplied of a product to a change in price.","chNum":9,"chTitle":"Price elasticity of supply","cloze":"the [[responsiveness]] of the [[quantity supplied]] of a product to a change in price."},{"id":"v065","term":"Equilibrium price","def":"the market price from which there will be no tendency for change. This will be at the price where quantity demanded = quantity supplied.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"the market price from which there will be [[no tendency]] for change. This will be at the price where [[quantity demanded = quantity supplied]]."},{"id":"v066","term":"Market equilibrium","def":"the price from which there will be no tendency for change given existing conditions of demand and supply – the price at which demand equals supply. Also known simply as “equilibrium”.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"the price from which there will be no tendency for change given [[existing conditions of demand]] and supply – the price at which [[demand equals supply]]. Also [[known simply as “equilibrium]]”."},{"id":"v067","term":"Market disequilibrium","def":"a situation in which demand does not equal supply, in which case there will be a tendency for price to change – to rise if demand is greater than supply and to fall if supply is greater than demand. Also known simply as “disequilibrium”.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"a situation in which [[demand does not equal]] supply, in which case there will be a tendency for price to change – to rise [[if demand]] is greater than supply and to fall [[if supply]] is greater than demand. Also known simply as “disequilibrium”."},{"id":"v068","term":"Joint or complementary demand","def":"a situation in which two goods are normally demanded together.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"a situation in which [[two goods are normally]] demanded together."},{"id":"v069","term":"Alternative demand","def":"a situation in which two goods are regarded as alternatives for one another.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"a situation in which [[two goods are regarded]] as [[alternatives]] for one another."},{"id":"v070","term":"Derived demand","def":"a situation in which a product or service, such as labour, is not demanded for itself, but its demand is dependent on the demand for the product it helps to produce.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"a situation in which a product or service, such as [[labour]], is not demanded for [[itself, but its demand]] is [[dependent on the demand]] for the product it helps to produce."},{"id":"v071","term":"Composite demand","def":"the situation in which a good is demanded for more than one purpose.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"the situation in which a [[good]] is [[demanded]] for more than one [[purpose]]."},{"id":"v072","term":"Joint supply","def":"a situation where the production of one good automatically brings about an increase in the supply of another.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"a situation where the production of one [[good automatically brings about]] an increase in the supply of another."},{"id":"v073","term":"Competitive supply","def":"an increase in the supply of one product will automatically lead to a reduction in the supply of another. Cha er 11 Consumer and producer surplus.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"an increase in the supply of one product will [[automatically lead]] to a reduction in the [[supply of another. Cha]] er 11 Consumer and [[producer surplus]]."},{"id":"v074","term":"Consumer surplus","def":"the difference between the maximum price an individual is prepared to pay for a good and the price actually paid.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"the difference between the [[maximum price]] an individual is [[prepared]] to pay for a good and the [[price actually paid]]."},{"id":"v075","term":"Producer surplus","def":"the difference between the minimum price a supplier is prepared to accept for a good and the price actually received.","chNum":10,"chTitle":"The interaction of demand and supply","cloze":"the difference between the [[minimum price]] a [[supplier]] is prepared to accept for a good and the [[price actually received]]."},{"id":"v076","term":"market failure","def":"an inefficient allocation of goods and services in the market.","chNum":12,"chTitle":"Reasons for government intervention in markets","cloze":"an [[inefficient allocation]] of goods and services in the market."},{"id":"v077","term":"Indirect tax","def":"a tax levied on expenditure.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":""},{"id":"v078","term":"Ad valorem taxes","def":"a proportion or percentage of the price charged by the retailer.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"a proportion or percentage of the [[price charged]] by the [[retailer]]."},{"id":"v079","term":"Specific tax","def":"where a specific amount of money has to be paid in taxation.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"where a specific amount of [[money]] has to be [[paid]] in [[taxation]]."},{"id":"v080","term":"Impact of a tax","def":"this refers to the person or company on which a tax is levied.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"this refers to the person or company on which a [[tax is levied]]."},{"id":"v081","term":"Incidence of a tax","def":"this refers to the eventual distribution of the burden of a tax.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"this refers to the [[eventual]] distribution of the [[burden of a tax]]."},{"id":"v082","term":"Progressive tax","def":"where the proportion of income paid in tax increases as income increases.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"where the proportion of income paid in [[tax increases]] as [[income increases]]."},{"id":"v083","term":"Inheritance tax","def":"a tax which is paid on the money, property and possessions of someone who has died.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"a [[tax which is paid]] on the [[money, property]] and possessions of someone who has [[died]]."},{"id":"v084","term":"Capital gains tax","def":"a tax which is paid on the surplus obtained from the sale of an asset for more than was originally paid for it.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"a [[tax which is paid]] on the [[surplus obtained]] from the sale of an [[asset]] for more than was originally paid for it."},{"id":"v085","term":"Subsidies","def":"an amount of money paid by a government to a producer so that the price to the consumer will be lower than it otherwise would have been.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"an amount of [[money paid]] by a government to a producer [[so that the price]] to the consumer will be lower than it [[otherwise]] would have been."},{"id":"v086","term":"Direct provision of goods and services","def":"this is where a government decides to provide particular goods and/ or services itself.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"this is where a government [[decides]] to provide particular goods and/ or services [[itself]]."},{"id":"v087","term":"Maximum price","def":"a situation where a maximum price or price ceiling is established in a market below what would have been the equilibrium price without government intervention.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"a situation where a maximum price or [[price ceiling]] is established in a market below what would have been the [[equilibrium price]] without government [[intervention]]."},{"id":"v088","term":"Minimum price","def":"a situation where a minimum price or price floor is established in a market above what would have been the equilibrium price without government intervention.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"a situation where a minimum price or [[price floor]] is established in a market above what would have been the [[equilibrium price]] without government [[intervention]]."},{"id":"v089","term":"Buffer stock","def":"an amount of a commodity that is held to limit the range of price fluctuations in a market.","chNum":13,"chTitle":"Methods and effects of government intervention in markets","cloze":"an amount of a [[commodity]] that is held to [[limit]] the range of [[price fluctuations]] in a market."},{"id":"v090","term":"Income","def":"money received, especially on a regular basis.","chNum":14,"chTitle":"Addressing income and wealth inequality","cloze":"[[money received]], especially on a regular [[basis]]."},{"id":"v091","term":"Wealth","def":"all possessions that have a monetary or exchange value.","chNum":14,"chTitle":"Addressing income and wealth inequality","cloze":"all possessions that have a [[monetary]] or [[exchange value]]."},{"id":"v092","term":"Gini coefficient","def":"a statistical measure of the degree of inequality of income in an economy. The lower the figure, the more equal is the distribution of income.","chNum":14,"chTitle":"Addressing income and wealth inequality","cloze":"a statistical measure of the degree of [[inequality]] of [[income]] in an economy. The lower the figure, the more equal is the [[distribution of income]]."},{"id":"v093","term":"Transfer payment","def":"a payment made to an individual by a government that is not a reward for any productive effort.","chNum":14,"chTitle":"Addressing income and wealth inequality","cloze":"a payment made to an individual by a government that is not a [[reward]] for any [[productive effort]]."},{"id":"v094","term":"National income","def":"the total value added in the production of goods and services in a country plus net property income from abroad in a year minus depreciation in a year.","chNum":15,"chTitle":"National income statistics","cloze":"the [[total value added]] in the production of goods and services in a country plus [[net property income]] from abroad in a year minus [[depreciation]] in a year."},{"id":"v095","term":"Net property income from abroad","def":"consists of the inflow of interest, profits and dividends into a country minus the outflow.","chNum":15,"chTitle":"National income statistics","cloze":"consists of the inflow of [[interest, profits]] and [[dividends]] into a country minus the [[outflow]]."},{"id":"v096","term":"Depreciation","def":"a figure used to measure the fall in value of the capital stock of a country. It is sometimes referred to as capital consumption.","chNum":15,"chTitle":"National income statistics","cloze":"a figure used to measure the fall in value of the [[capital stock]] of a country. It is [[sometimes referred]] to as [[capital consumption]]."},{"id":"v097","term":"Gross domestic property (GDP)","def":"the total value added in the production of goods and services in a country in a year.","chNum":15,"chTitle":"National income statistics","cloze":"the [[total value added]] in the production of goods and services in a [[country]] in a [[year]]."},{"id":"v098","term":"Gross national income (GNI)","def":"the total incomes received by a country’s residents in a year.","chNum":15,"chTitle":"National income statistics","cloze":"the [[total incomes received]] by a country’s residents in a [[year]]."},{"id":"v099","term":"Net national income (NNI)","def":"GNI minus the depreciation of fixed capital assets (dwellings, buildings, machinery, transport equipment and physical infrastructure) through wear and tear and obsolescence.","chNum":15,"chTitle":"National income statistics","cloze":"GNI minus the [[depreciation]] of [[fixed capital]] [[assets (dwellings, buildings, machinery]], transport equipment and physical infrastructure) through wear and tear and obsolescence."},{"id":"v100","term":"Market prices","def":"a measure of value in terms of actual market prices at which the goods are sold. It includes taxes, but excludes subsidies.","chNum":15,"chTitle":"National income statistics","cloze":"a measure of value in terms of actual market prices at which the goods are [[sold]]. It [[includes]] [[taxes, but excludes subsidies]]."},{"id":"v101","term":"Basic prices","def":"the amount the producer receives from the purchaser per unit of goods or service produced, less the taxes on the products and plus any subsidies on the products.","chNum":15,"chTitle":"National income statistics","cloze":"the amount the producer receives from the [[purchaser]] per unit of goods or service produced, less the [[taxes]] on the products and plus any [[subsidies]] on the products."},{"id":"v102","term":"Circular flow of income","def":"shows how money circulates in an economy between households, firms and government.","chNum":16,"chTitle":"Circular flow of income","cloze":"[[shows how money circulates]] in an economy between households, firms and government."},{"id":"v103","term":"Closed economy","def":"an economy without exports or imports consisting solely of consumption, investment and government expenditure.","chNum":16,"chTitle":"Circular flow of income","cloze":"an economy without exports or [[imports consisting solely]] of [[consumption, investment]] and government expenditure."},{"id":"v104","term":"Open economy","def":"an economy in which there are exports and imports.","chNum":16,"chTitle":"Circular flow of income","cloze":"an economy in which there are [[exports]] and [[imports]]."},{"id":"v105","term":"Injection","def":"money from outside the circular flow that increases the value of GDP.","chNum":16,"chTitle":"Circular flow of income","cloze":"[[money from outside]] the [[circular flow]] that increases the value of GDP."},{"id":"v106","term":"Saving","def":"that part of a household’s current income which is not consumed.","chNum":16,"chTitle":"Circular flow of income","cloze":"that part of a household’[[s current income]] which is [[not consumed]]."},{"id":"v107","term":"Leakage","def":"income received by households, firms or governments that is not passed on in the circular flow and thus reduces the value of GDP.","chNum":16,"chTitle":"Circular flow of income","cloze":"[[income received]] by households, firms or [[governments]] that is not passed on in the circular flow and [[thus reduces]] the value of GDP."},{"id":"v108","term":"Equilibrium","def":"where the economy is neither growing nor shrinking: J = W.","chNum":16,"chTitle":"Circular flow of income","cloze":"where the economy is neither [[growing nor shrinking: J]] = W."},{"id":"v109","term":"Disequilibrium","def":"where the economy is either growing in size, J > W, or shrinking in size, W > J.","chNum":16,"chTitle":"Circular flow of income","cloze":"where the economy is either growing in [[size, J > W]], or [[shrinking]] in [[size, W > J]]."},{"id":"v110","term":"Aggregate demand","def":"total amount of goods and services demanded or total expenditure on goods and services in an economy.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"[[total]] amount of goods and services [[demanded]] or [[total expenditure]] on goods and services in an economy."},{"id":"v111","term":"Consumption","def":"that part of a household’s current income which is spent on goods and services.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"that part of a household’[[s current income]] which is [[spent]] on goods and services."},{"id":"v112","term":"Investment","def":"the expenditure on capital goods or assets, not for current consumption but for future consumption. It broadly refers to spending now on an asset that should generate an income at some point in the future.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"the expenditure on capital goods or [[assets, not]] for [[current consumption but]] for [[future consumption]]. It broadly refers to spending now on an asset that should generate an income at some point in the future."},{"id":"v113","term":"Government expenditure","def":"government expenditure consists of all government consumption, investment, and transfer payments.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"government [[expenditure consists]] of all government [[consumption, investment]], and transfer payments."},{"id":"v114","term":"Exports","def":"the sale of goods and services abroad. Exports bring money into the country.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"the [[sale]] of goods and services [[abroad]]. Exports [[bring money]] into the country."},{"id":"v115","term":"Imports","def":"the purchase of goods and services from abroad. Imports take money away from a country.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"the [[purchase]] of goods and services from [[abroad]]. Imports [[take money away]] from a country."},{"id":"v116","term":"Aggregate supply","def":"the total value of goods and services produced in the economy.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"the [[total value]] of goods and services produced in the economy."},{"id":"v117","term":"Productivity","def":"the quantity of goods and services produced per unit of input per period of time.","chNum":17,"chTitle":"Aggregate demand and Aggregate supply","cloze":"the [[quantity]] of goods and services produced per unit of [[input]] per [[period]] of time."},{"id":"v118","term":"Economic growth","def":"an increase in the production potential or real level of output of an economy. It is possible to distinguish between actual and potential growth in national output.","chNum":18,"chTitle":"Economic growth","cloze":"an increase in the production potential or real level of [[output]] of an economy. It is possible to distinguish between actual and [[potential growth]] in [[national output]]."},{"id":"v119","term":"Real GDP","def":"nominal GDP adjusted for changes in inflation, sometimes called GDP at constant prices.","chNum":18,"chTitle":"Economic growth","cloze":"nominal GDP adjusted for changes in [[inflation, sometimes]] called GDP at [[constant prices]]."},{"id":"v120","term":"Nominal GDP","def":"total value of goods and services at current prices.","chNum":18,"chTitle":"Economic growth","cloze":"[[total]] value of goods and services at [[current prices]]."},{"id":"v121","term":"Unemployment","def":"those people of working age who are actively seeking work at the current wage rate.","chNum":19,"chTitle":"Unemployment","cloze":"those people of [[working age]] who are [[actively]] seeking work at the [[current wage rate]]."},{"id":"v122","term":"Unemployment rate","def":"the percentage of the working population who are unemployed.","chNum":19,"chTitle":"Unemployment","cloze":"the percentage of the [[working population]] who are unemployed."},{"id":"v123","term":"Labour force survey","def":"a survey of a sample of households, counting people as unemployed if they are actively seeking work, but do not have a job.","chNum":19,"chTitle":"Unemployment","cloze":"a survey of a sample of households, [[counting people]] as [[unemployed if]] they are [[actively seeking work, but]] do not have a job."},{"id":"v124","term":"Claimant count","def":"measures unemployment according to the number of people claiming unemployment benefits.","chNum":19,"chTitle":"Unemployment","cloze":"measures unemployment according to the number of [[people claiming unemployment benefits]]."},{"id":"v125","term":"Sampling","def":"when a proportion of the population is taken as representative of the whole. The figure for the total is based on the sample being accurate.","chNum":19,"chTitle":"Unemployment","cloze":"when a proportion of the population is taken as [[representative]] of the whole. The figure for the [[total]] is based on the sample being [[accurate]]."},{"id":"v126","term":"Hysteresis","def":"as those made unemployed find that their skills become outdated so that it is harder to find work, leading to a lack of confidence and motivation and higher long run unemployment.","chNum":19,"chTitle":"Unemployment","cloze":"as those made unemployed find that their [[skills become outdated so]] that it is harder to [[find work, leading]] to a lack of confidence and motivation and [[higher long run unemployment]]."},{"id":"v127","term":"Inflation","def":"a fall in the value of money shown by a persistent rise in the general price level. Alternatively, inflation is a persistent rise in the general price level leading to a fall in the value of money.","chNum":20,"chTitle":"Price stability","cloze":"a fall in the value of [[money shown]] by a persistent rise in the general [[price level. Alternatively]], inflation is a persistent rise in the general [[price level leading]] to a fall in the value of money."},{"id":"v128","term":"Deflation","def":"a fall in the general price level.","chNum":20,"chTitle":"Price stability","cloze":"a fall in the general [[price]] level."},{"id":"v129","term":"Disinflation","def":"when the general price level rises at a slower rate.","chNum":20,"chTitle":"Price stability","cloze":"when the general [[price]] level [[rises]] at a [[slower rate]]."},{"id":"v130","term":"Consumer price index","def":"a measure of the weighted average of prices of a basket of goods and services purchased by households.","chNum":20,"chTitle":"Price stability","cloze":"a measure of the [[weighted average]] of [[prices]] of a basket of goods and services [[purchased]] by households."},{"id":"v131","term":"Base year","def":"the year which is chosen as the point of reference for a comparison of prices in other years.","chNum":20,"chTitle":"Price stability","cloze":"the year which is [[chosen]] as the point of [[reference]] for a [[comparison of prices]] in other years."},{"id":"v132","term":"Weights","def":"values given to items in an index to show their relative importance.","chNum":20,"chTitle":"Price stability","cloze":"[[values]] given to [[items]] in an index to show their [[relative importance]]."},{"id":"v133","term":"Household expenditure","def":"the total expenditure by consumers resident in a country whether at home or abroad minus expenditure by visitors on goods and services.","chNum":20,"chTitle":"Price stability","cloze":"the [[total expenditure]] by consumers [[resident]] in a country whether at home or abroad minus expenditure by [[visitors]] on goods and services."},{"id":"v134","term":"Money data, money values, nominal prices","def":"where figures are expressed in current prices.","chNum":20,"chTitle":"Price stability","cloze":"where figures are expressed in [[current prices]]."},{"id":"v135","term":"Real data","def":"where figures are adjusted for the change in the value of money (rate of inflation/price level).","chNum":20,"chTitle":"Price stability","cloze":"where figures are [[adjusted]] for the change in the value of [[money (rate]] of [[inflation/price]] level)."},{"id":"v136","term":"Demand-pull inflation","def":"occurs when the total (aggregate) demand in the economy exceeds the total (aggregate) supply.","chNum":20,"chTitle":"Price stability","cloze":"occurs when the [[total (aggregate) demand]] in the economy exceeds the total ([[aggregate) supply]]."},{"id":"v137","term":"Cost-push inflation","def":"occurs when the cost of supplying goods and services is increased, causing a rise in the cost of final prices.","chNum":20,"chTitle":"Price stability","cloze":"occurs when the [[cost of supplying]] goods and services is [[increased, causing]] a rise in the cost of [[final prices]]."},{"id":"v138","term":"Government budget","def":"an annual financial statement showing estimates of expected revenue and expenditure during a fiscal year.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"an annual [[financial statement]] showing estimates of [[expected revenue]] and expenditure during a [[fiscal year]]."},{"id":"v139","term":"Budget deficit","def":"when government spending is greater than tax revenue.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"when government [[spending]] is greater than [[tax revenue]]."},{"id":"v140","term":"Budget surplus","def":"when government spending is less than tax revenue.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"when government [[spending]] is less than [[tax revenue]]."},{"id":"v141","term":"National debt","def":"the amount of money a government owes both domestically and abroad, which has accumulated over a number of years.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"the amount of [[money]] a government [[owes both domestically]] and abroad, which has [[accumulated]] over a number of years."},{"id":"v142","term":"Direct tax","def":"a tax levied directly on incomes and wealth.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"a [[tax levied directly]] on incomes and wealth."},{"id":"v143","term":"Indirect tax","def":"one which is levied when goods and services are bought.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"one which is [[levied]] when goods and services are [[bought]]."},{"id":"v144","term":"Progressive tax","def":"where the proportion of income paid in tax increases as income increases.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"where the proportion of income paid in [[tax increases]] as [[income increases]]."},{"id":"v145","term":"Marginal rate of tax","def":"the addition to tax paid out of an addition to income.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"the addition to [[tax paid out]] of an addition to [[income]]."},{"id":"v146","term":"Regressive tax","def":"where the proportion of income paid in tax falls as income increases.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"where the proportion of [[income]] paid in [[tax falls]] as [[income increases]]."},{"id":"v147","term":"Proportional tax","def":"where the same proportion of income is paid in tax whatever the level of income.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"where the same proportion of [[income is paid]] in [[tax whatever]] the level of [[income]]."},{"id":"v148","term":"Average rate of tax","def":"the average percentage of total income that is paid in taxes.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"the [[average percentage]] of total income that is [[paid]] in [[taxes]]."},{"id":"v149","term":"Ad valorem taxes","def":"a tax on expenditure imposed as a percentage of the selling price.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"a tax on expenditure [[imposed]] as a percentage of the [[selling price]]."},{"id":"v150","term":"Capital expenditure","def":"spending by the government on goods and services intended to create future benefits.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"spending by the government on goods and services [[intended]] to [[create future benefits]]."},{"id":"v151","term":"Current expenditure","def":"government consumption expenditure on goods and services for current use to directly satisfy the individual or collective needs of members of the community.","chNum":21,"chTitle":"Government macroeconomic policy objectives","cloze":"government [[consumption expenditure]] on goods and services for current use to [[directly satisfy]] the individual or [[collective needs]] of members of the community."},{"id":"v152","term":"Fiscal policy","def":"the use of government revenue and expenditure to control the economy.","chNum":22,"chTitle":"Fiscal policy","cloze":"the use of government [[revenue]] and [[expenditure]] to [[control]] the economy."},{"id":"v153","term":"Expansionary fiscal policy","def":"the use of fiscal policy to enable the economy to grow.","chNum":22,"chTitle":"Fiscal policy","cloze":"the use of [[fiscal policy to enable]] the economy to grow."},{"id":"v154","term":"Contractionary fiscal policy","def":"the use of fiscal policy to reduce the size of the economy.","chNum":22,"chTitle":"Fiscal policy","cloze":"the use of [[fiscal policy to reduce]] the size of the economy."},{"id":"v155","term":"Monetary policy","def":"the use of the rate of interest or money supply or credit regulations to control the economy.","chNum":23,"chTitle":"Monetary policy","cloze":"the use of the rate of [[interest]] or [[money supply]] or [[credit regulations]] to control the economy."},{"id":"v156","term":"Expansionary monetary policy","def":"expanding, or increasing, the money supply in an economy.","chNum":23,"chTitle":"Monetary policy","cloze":"[[expanding]], or increasing, the [[money supply]] in an economy."},{"id":"v157","term":"Contractionary monetary policy","def":"decreasing the money supply in the economy.","chNum":23,"chTitle":"Monetary policy","cloze":"decreasing the [[money supply]] in the economy."},{"id":"v158","term":"Interest rates","def":"the cost of borrowing money and the return on lending money. Interest rate policy is the use of interest rates to influence demand by both consumers and businesses.","chNum":23,"chTitle":"Monetary policy","cloze":"the cost of [[borrowing money]] and the return on [[lending money. Interest rate]] policy is the use of interest rates to [[influence demand]] by both consumers and businesses."},{"id":"v159","term":"Money supply","def":"the total amount of money in an economy. This can be taken as notes, coins and easily accessible accounts, e.g. current accounts.","chNum":23,"chTitle":"Monetary policy","cloze":"the [[total]] amount of money in an economy. This can be taken as notes, coins and [[easily accessible accounts]], [[e.g. current accounts]]."},{"id":"v160","term":"Credit regulations","def":"the use of qualitative control measures by the central bank to regulate the consumer credit on certain products which are affected by inflation or deflation.","chNum":23,"chTitle":"Monetary policy","cloze":"the use of qualitative control measures by the [[central bank]] to regulate the consumer credit on certain products which are affected by [[inflation]] or [[deflation]]."},{"id":"v161","term":"Supply-side policy","def":"any policy that helps to improve a country’s productive potential.","chNum":24,"chTitle":"Supply-side policy","cloze":"any [[policy that helps]] to improve a country’[[s productive]] potential."},{"id":"v162","term":"Inflation","def":"there is a sustained increase in the average price level in an economy.","chNum":24,"chTitle":"Supply-side policy","cloze":"there is a [[sustained]] increase in the [[average price]] level in an economy."},{"id":"v163","term":"Deflation","def":"a fall in the average level of prices.","chNum":24,"chTitle":"Supply-side policy","cloze":"a fall in the [[average]] level of [[prices]]."},{"id":"v164","term":"Productive capacity","def":"increasing the potential output of an economy.","chNum":24,"chTitle":"Supply-side policy","cloze":"increasing the [[potential output]] of an economy."},{"id":"v165","term":"Red tape","def":"Such rules and regulations may operate against producers in less developed countries, who may find it especially difficult to meet demanding standards of production or to cope with excessive administrative burdens。.","chNum":24,"chTitle":"Supply-side policy","cloze":"Such rules and regulations may operate against producers in [[less developed countries]], who may find it especially difficult to [[meet demanding standards]] of production or to cope with [[excessive administrative burdens]]。."},{"id":"v166","term":"Privatisation","def":"where an enterprise in public ownership is returned to privateownership.","chNum":24,"chTitle":"Supply-side policy","cloze":"where an [[enterprise]] in [[public ownership]] is returned to privateownership."},{"id":"v167","term":"Deregulation","def":"a government removes restrictions placed onproducers in a market in order to encourage competition.","chNum":24,"chTitle":"Supply-side policy","cloze":"a government [[removes restrictions]] placed onproducers in a market in order to [[encourage competition]]."},{"id":"v168","term":"Absolute advantage","def":"the ability to produce more of a product than another country that has the same amount of resources can produce.","chNum":25,"chTitle":"The reasons for international trade","cloze":"the [[ability]] to produce more of a product than another [[country]] that has the same amount of resources can produce."},{"id":"v169","term":"Comparative advantage","def":"the ability to produce a product at a lower opportunity cost.","chNum":25,"chTitle":"The reasons for international trade","cloze":"the ability to produce a product at a [[lower opportunity cost]]."},{"id":"v170","term":"Terms of trade","def":"the ratio of a country’s export prices to import prices.","chNum":25,"chTitle":"The reasons for international trade","cloze":"the ratio of a [[country’s export prices]] to import prices."},{"id":"v171","term":"Globalisation","def":"the expansion of world trade in goods and services, together with capital flows, leading to greater international interdependence.","chNum":25,"chTitle":"The reasons for international trade","cloze":"the expansion of [[world trade]] in goods and services, together with [[capital flows, leading]] to [[greater international]] interdependence."},{"id":"v172","term":"Protectionism","def":"an action designed to reduce international trade.","chNum":26,"chTitle":"Protectionism","cloze":"an action designed to reduce [[international trade]]."},{"id":"v173","term":"Tariff","def":"a tax on a product imported into a country. Tariffs can be either specific or ad valorem.","chNum":26,"chTitle":"Protectionism","cloze":"a tax on a product [[imported]] into a [[country]]. Tariffs can be either specific or [[ad valorem]]."},{"id":"v174","term":"Import quota","def":"a legal limit on the quantity of a product that can be imported into a country.","chNum":26,"chTitle":"Protectionism","cloze":"a [[legal limit]] on the [[quantity]] of a product that can be [[imported]] into a country."},{"id":"v175","term":"Export subsidy","def":"money given to an exporter so the price of the product can be reduced to make it more competitive on world markets.","chNum":26,"chTitle":"Protectionism","cloze":"[[money]] given to an [[exporter so the price]] of the product can be reduced to make it more [[competitive]] on world markets."},{"id":"v176","term":"Embargo","def":"a complete ban on products from a particular country.","chNum":26,"chTitle":"Protectionism","cloze":"a [[complete ban]] on products from a particular [[country]]."},{"id":"v177","term":"Excessive administrative burdens","def":"excessive “red tape” imposed on importers to make importing more difficult.","chNum":26,"chTitle":"Protectionism","cloze":"[[excessive “red tape” imposed]] on importers to make importing more difficult."},{"id":"v178","term":"Infant industry","def":"an industry which is expected to have a comparative advantage, but at the moment is small and unable to compete with established industries elsewhere in the world.","chNum":26,"chTitle":"Protectionism","cloze":"an industry which is expected to have a [[comparative advantage, but]] at the moment is small and unable to [[compete]] with established industries [[elsewhere]] in the world."},{"id":"v179","term":"Sunrise industry","def":"new or relatively new industries which are rapidly growing and are believed to have the potential to be a market leader in the future.","chNum":26,"chTitle":"Protectionism","cloze":"new or [[relatively new]] industries which are [[rapidly growing]] and are [[believed]] to have the potential to be a market leader in the future."},{"id":"v180","term":"Sunset industries","def":"industries which have lost their comparative advantage.","chNum":26,"chTitle":"Protectionism","cloze":"industries which have lost their [[comparative advantage]]."},{"id":"v181","term":"Dumping","def":"the sale of a product in a foreign market at a price below its marginal cost of production.","chNum":26,"chTitle":"Protectionism","cloze":"the sale of a product in a [[foreign]] market at a [[price]] below its [[marginal cost]] of production."},{"id":"v182","term":"Current account","def":"a record of transactions in terms of trade in goods, services and primary and secondary income.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"a record of [[transactions]] in terms of [[trade]] in goods, services and primary and [[secondary income]]."},{"id":"v183","term":"Trade in goods","def":"the export and import of goods.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"the [[export]] and [[import]] of goods."},{"id":"v184","term":"Trade in services","def":"the export and import of services.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"the [[export]] and [[import]] of services."},{"id":"v185","term":"Primary income","def":"the income from interest, profits, dividends generated from foreign investment and also i.e. payments from people living and working overseas.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"the income from [[interest, profits, dividends generated]] from [[foreign investment]] and also i.e. payments from people [[living]] and working overseas."},{"id":"v186","term":"Secondary income","def":"the transfer of money, which is not investment, without receiving anything directly in return.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"the [[transfer of money]], which is [[not investment]], without [[receiving]] anything directly in return."},{"id":"v187","term":"Deficit (in the current account)","def":"this is where payments made by a country exceed payments received by a country.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"this is where payments made by a [[country exceed payments received]] by a country."},{"id":"v188","term":"Surplus (in the current account)","def":"this is where payments received by a country exceed payments made by a country.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"this is where [[payments]] received by a [[country exceed payments]] made by a country."},{"id":"v189","term":"Balance of the current account","def":"this is the difference between money flowing in to the country from trade in goods and services and primary and secondary income and money flowing out.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"this is the difference between [[money flowing]] in to the country from trade in goods and services and primary and [[secondary income]] and [[money flowing out]]."},{"id":"v190","term":"Imbalance in the current account","def":"this is where there is either a deficit, a negative figure, or a surplus, a positive figure.","chNum":27,"chTitle":"Current account of the balance of payments","cloze":"this is where there is either a [[deficit]], a [[negative figure]], or a [[surplus]], a positive figure."},{"id":"v191","term":"Exchange rate","def":"the price of one currency expressed in terms of another currency.","chNum":28,"chTitle":"Exchange rates","cloze":"the price of one [[currency expressed]] in terms of another [[currency]]."},{"id":"v192","term":"Floating exchange rate","def":"where the value of a country’s currency is determined solely by market forces.","chNum":28,"chTitle":"Exchange rates","cloze":"where the value of a [[country’s currency]] is [[determined solely]] by market forces."},{"id":"v193","term":"Appreciation","def":"when a floating exchange rate increases in value.","chNum":28,"chTitle":"Exchange rates","cloze":"when a [[floating exchange rate]] increases in value."},{"id":"v194","term":"Depreciation","def":"when a floating exchange rate decreases in value.","chNum":28,"chTitle":"Exchange rates","cloze":"when a [[floating exchange rate]] decreases in value."},{"id":"v195","term":"Speculation","def":"where one or people gamble on a currency rising, by buying, or falling, by selling a floating exchange rate increases in value.","chNum":28,"chTitle":"Exchange rates","cloze":"where one or people gamble on a [[currency rising]], by buying, or [[falling]], by selling a [[floating exchange rate increases]] in value."},{"id":"v196","term":"Hot money","def":"short-term capital flows in the foreign exchange market due to changes in interest rates.","chNum":28,"chTitle":"Exchange rates","cloze":"short-term capital flows in the [[foreign exchange market]] due to changes in [[interest rates]]."},{"id":"v197","term":"World Trade Organization (WTO)","def":"the international organisation which establishes, monitors and reinforces the rules of trade between nations.","chNum":28,"chTitle":"Exchange rates","cloze":"the international organisation which [[establishes, monitors]] and reinforces the [[rules]] of [[trade between nations]]."}];
+
+/* ============ FSRS 式记忆模型 ============
+ * 每张卡记录：state(状态) / S(稳定度，天，= 留存跌到 90% 所需天数) / D(难度 1-10) / reps / lapses / last / due
+ * 遗忘曲线（艾宾浩斯指数衰减）：R(t) = e^(-k·t/S)，其中 k = -ln(0.9) ≈ 0.1054
+ * 即 t = S 时 R ≈ 90%，所以“下次复习间隔 = S 天”。
+ */
+const R_TARGET = 0.9;
+const K_DECAY = -Math.log(R_TARGET); // ≈ 0.1053605
+const K_PROG="vwords_progress_v1", K_CHK="vwords_checkin_v1", K_STAT="vwords_stats_v1", K_SESS="vwords_session_v1";
+
+/* ---------- 存储 ---------- */
+function load(k,def){try{return JSON.parse(localStorage.getItem(k))??def}catch(e){return def}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+let PROG = load(K_PROG,{});
+// ---- Phase 3：进度云端同步访问器（供 sync.js 读写本地 PROG/CPROG）----
+window.__deckStore = {
+  deckSlug: DECK_SLUG,
+  getProg: function(){ return PROG; },
+  setProg: function(p){ PROG = p; save(K_PROG, PROG); },
+  hasCloze: function(){ return typeof CPROG !== 'undefined'; },
+  getCProg: function(){ return (typeof CPROG !== 'undefined') ? CPROG : null; },
+  setCProg: function(p){ if (typeof CPROG !== 'undefined') { CPROG = p; save(K_CPROG, CPROG); } },
+  getCheckins: function(){ return CHK; },
+  setCheckins: function(v){ CHK=Array.isArray(v)?v:[]; save(K_CHK,CHK); },
+  getStats: function(){ return STAT; },
+  setStats: function(v){ STAT=v&&typeof v==='object'?v:{}; save(K_STAT,STAT); }
+};
+let CHK  = load(K_CHK,[]);
+let STAT = load(K_STAT,{});
+
+/* ---------- 旧版 Leitner(盒子) 进度迁移到新模型（不丢已有学生进度） ---------- */
+function migrate(p){
+  if(!p) return null;
+  if(p.S!==undefined) return p;            // 已经是新模型
+  if(p.box===undefined && p.due===undefined) return p;
+  const box = p.box||0;
+  if(box===0) return {state:"new",S:0,D:5,reps:0,lapses:0,last:null,due:todayStr()};
+  const oldInt = {1:1,2:2,3:4,4:8,5:16}[Math.min(5,box)] || 1;
+  const D = clamp(5 + (p.lapses||0)*1.2 - (p.reps||0)*0.15, 1, 10);
+  const last = addDays(p.due||todayStr(), -oldInt);
+  return {state:"review", S:oldInt, D, reps:p.reps||0, lapses:p.lapses||0, last, due:p.due||todayStr()};
+}
+for(const id in PROG) PROG[id]=migrate(PROG[id]);
+
+/* ---------- 日期 ---------- */
+function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function addDays(ds,n){let d=new Date(ds+"T00:00:00");d.setDate(d.getDate()+n);return todayStr(d)}
+function daysBetween(a,b){return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+/* ---------- 状态 ---------- */
+function st(id){return PROG[id]||{state:"new",S:0,D:5,reps:0,lapses:0,last:null,due:todayStr()}}
+function isNew(id){return st(id).state==="new"}
+function isDue(id){const p=st(id);if(p.state==="new")return false;return p.due<=todayStr()}
+function statusOf(id){const p=st(id);
+  if(p.state==="new")return"new";
+  if(p.state==="relearning")return"learn";
+  if((p.S||0)>=21)return"master";
+  return"learn";
+}
+function levelLabel(id){const p=st(id);
+  if(p.state==="new")return["新词","n"];
+  if(p.state==="relearning")return["再学习","l"];
+  if(statusOf(id)==="master")return["已掌握","m"];
+  if((p.S||0)<=4)return["薄弱","l"];
+  return["学习",""];
+}
+function isWeak(id){const p=st(id);return p.state!=="new"&&(p.state==="relearning"||(p.S||0)<=4)}
+function retention(id){const p=st(id);if(p.state==="new"||!p.S)return 1;
+  const dt=Math.max(0,daysBetween(p.last,todayStr()));return Math.exp(-K_DECAY*dt/Math.max(0.1,p.S));}
+
+/* ---------- 评分 / 排期（FSRS 式） ---------- */
+function rate(id,grade){
+  const p=st(id);
+  let S=p.S||0, D=p.D||5, reps=p.reps||0, lapses=p.lapses||0;
+  const firstSuccess = (p.state==="new"||p.state==="learning"||p.state==="relearning");
+  let np;
+  if(grade==="again"){
+    lapses++;
+    S=Math.max(0.2,(S||1)*0.3);
+    D=clamp(D+1.2,1,10);
+    np={state:"relearning",S,D,reps:reps,lapses,last:todayStr(),due:addDays(todayStr(),1)};
+  } else {
+    if(firstSuccess){
+      const base = grade==="hard"?1.2:2.0;        // 首次间隔
+      S=base;
+      D=clamp(D+(grade==="hard"?0.6:-0.4),1,10);
+      reps=1;
+    } else {
+      const ease = grade==="hard"?1.3:2.1;
+      const diffFactor = 1 + (10-D)/10*0.3;        // 越难(D大)增长越慢
+      S=Math.min(365,Math.max(0.2,S*ease*diffFactor));
+      D=clamp(D+(grade==="hard"?0.3:-0.5),1,10);
+      reps++;
+    }
+    np={state:"review",S,D,reps,lapses,last:todayStr(),due:addDays(todayStr(),Math.round(S))};
+  }
+  PROG[id]=np; save(K_PROG,PROG);
+  const t=todayStr(); STAT[t]=(STAT[t]||0)+1; save(K_STAT,STAT);
+  if(window.Sync)Sync.push();
+}
+
+const K_CPROG="vwords_cloze_v1";
+let CPROG=load(K_CPROG,{});
+const CLOZE_SET=new Set(DATA.filter(d=>d.cloze).map(d=>d.id));
+function cst(id){return CPROG[id]||{state:"new",S:0,D:5,reps:0,lapses:0,last:null,due:todayStr()}}
+function cisNew(id){return cst(id).state==="new"}
+function cisDue(id){const p=cst(id);if(p.state==="new")return false;return p.due<=todayStr()}
+function cstatusOf(id){const p=cst(id);if(p.state==="new")return"new";if(p.state==="relearning")return"learn";if((p.S||0)>=21)return"master";return"learn"}
+function cisWeak(id){const p=cst(id);return p.state!=="new"&&(p.state==="relearning"||(p.S||0)<=4)}
+function crate(id,grade){
+  const p=cst(id); let S=p.S||0,D=p.D||5,reps=p.reps||0,lapses=p.lapses||0;
+  const firstSuccess=(p.state==="new"||p.state==="learning"||p.state==="relearning");
+  let np;
+  if(grade==="again"){lapses++;S=Math.max(0.2,(S||1)*0.3);D=clamp(D+1.2,1,10);np={state:"relearning",S,D,reps,lapses,last:todayStr(),due:addDays(todayStr(),1)};}
+  else{
+    if(firstSuccess){const base=grade==="hard"?1.2:2.0;S=base;D=clamp(D+(grade==="hard"?0.6:-0.4),1,10);reps=1;}
+    else{const ease=grade==="hard"?1.3:2.1;const diffFactor=1+(10-D)/10*0.3;S=Math.min(365,Math.max(0.2,S*ease*diffFactor));D=clamp(D+(grade==="hard"?0.3:-0.5),1,10);reps++;}
+    np={state:"review",S,D,reps,lapses,last:todayStr(),due:addDays(todayStr(),Math.round(S))};
+  }
+  CPROG[id]=np; save(K_CPROG,CPROG);
+  const t=todayStr(); STAT[t]=(STAT[t]||0)+1; save(K_STAT,STAT);
+  if(window.Sync)Sync.push();
+}
+
+/* ---------- 打卡（仅由完成学习自动触发，不可手动） ---------- */
+function autoCheckin(){return checkin()}
+function checkin(){
+  const t=todayStr();
+  let added=false;
+  if(!CHK.includes(t)){CHK.push(t);CHK.sort();save(K_CHK,CHK);added=true;}
+  if(added&&window.Sync)Sync.push();
+  refresh();
+  return added;
+}
+function streak(){
+  if(CHK.length===0)return{cur:0,best:0,tot:0};
+  let best=1,run=1;
+  const sorted=[...CHK].sort();
+  for(let i=1;i<sorted.length;i++){if(daysBetween(sorted[i-1],sorted[i])===1)run++;else run=1;best=Math.max(best,run)}
+  let cur=0;const t=todayStr();
+  if(CHK.includes(t)){cur=1;let d=addDays(t,-1);while(CHK.includes(d)){cur++;d=addDays(d,-1)}}
+  return{cur,best,tot:CHK.length};
+}
+
+/* ---------- 工具 ---------- */
+function toast(m){const el=document.getElementById("toast");el.textContent=m;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),1800)}
+function $(id){return document.getElementById(id)}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+// Phase5：错误次数加权复习 —— 错得越多的卡越优先进入复习队列（权重 = 1 + 错误次数）
+function wrongCount5(id){
+  const p=st(id);
+  return (p && typeof p.lapses==='number') ? p.lapses : 0;
+}
+// 指数加权洗牌：权重 w 越大越偏向排到队首（会话数量有限时优先保留易错卡）
+function weightedShuffle(ids, wfn){
+  return ids.map(function(id){
+    const w = 1 + (wfn ? wfn(id) : 0);
+    return { id: id, k: Math.pow(Math.random(), 1 / Math.max(0.0001, w)) };
+  }).sort(function(a,b){ return b.k - a.k; }).map(function(o){ return o.id; });
+}
+
+
+/* ---------- 本轮数量 ---------- */
+function getSessionSize(){const n=parseInt(load(K_SESS,"20"),10);return isNaN(n)?20:n}
+function setSessionSize(n){save(K_SESS,String(n));
+  const b=$("sessionSize2"); if(b)b.value=String(n);}
+
+/* ---------- 章节列表与渲染 ---------- */
+function chaptersList(){
+  const seen=new Map();
+  DATA.forEach(d=>{ if(!seen.has(d.chNum)) seen.set(d.chNum,{num:d.chNum,title:d.chTitle,ids:[]}); seen.get(d.chNum).ids.push(d.id); });
+  return [...seen.values()].sort((a,b)=>a.num-b.num);
+}
+/* ===== 试用模式（Trial）：限第一章节 + 复习锁定 ===== */
+window.__TRIAL__ = window.__TRIAL__ || false;
+window.__firstCh__ = null;
+window.__trialObsStarted = false;
+window.FlashTrial_MSG = '未解锁，可以联系管理员VX: Donna-CYF获取整套服务';
+window.showTrialLock = function(){
+  var MSG = '🔒 ' + window.FlashTrial_MSG;
+  try {
+    // 注入样式（仅一次）
+    if(!document.getElementById('trialLockStyle')){
+      var s=document.createElement('style'); s.id='trialLockStyle';
+      s.textContent='#trialLockOverlay{position:fixed;inset:0;background:rgba(20,20,30,.5);display:none;align-items:center;justify-content:center;z-index:99999;font-family:inherit}#trialLockOverlay.show{display:flex}#trialLockOverlay .trial-lock-modal{position:relative;background:#fff;color:#1f2937;border-radius:14px;padding:28px 32px;max-width:360px;margin:16px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3)}#trialLockOverlay .trial-lock-msg{font-size:15px;line-height:1.7;font-weight:600}#trialLockOverlay .trial-lock-close{position:absolute;top:6px;right:12px;border:none;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:#9ca3af}#trialLockOverlay .trial-lock-close:hover{color:#1f2937}';
+      (document.head||document.documentElement).appendChild(s);
+    }
+    var ov=document.getElementById('trialLockOverlay');
+    if(!ov){
+      ov=document.createElement('div'); ov.id='trialLockOverlay';
+      ov.innerHTML='<div class="trial-lock-modal"><button class="trial-lock-close" aria-label="关闭">×</button><div class="trial-lock-msg"></div></div>';
+      document.body.appendChild(ov);
+      ov.addEventListener('click',function(e){
+        if(e.target===ov || e.target.classList.contains('trial-lock-close')) ov.classList.remove('show');
+      });
+    }
+    ov.querySelector('.trial-lock-msg').textContent=MSG;
+    ov.classList.add('show');
+  } catch(e){
+    alert(MSG);
+  }
+};
+window.trialGuard = function(mode){
+  if(!window.__TRIAL__) return false;
+  // 复习类（含挖空复习）一律拦截
+  if (/^(due|weak|all|new|count:|cloze:(due|all|weak|count))/i.test(mode)) return true;
+  // 章节类：仅第一个章节放行
+  var m = /^((?:cloze:)?ch):(.+)$/i.exec(mode);
+  if (m){
+    if(window.__firstCh__ === null){
+      var fc = document.querySelector('#chapterGrid .chcard');
+      if(fc) window.__firstCh__ = fc.getAttribute('data-ch');
+    }
+    return String(m[2]) !== String(window.__firstCh__);
+  }
+  return false;
+};
+window.applyTrialLocks = function(){
+  if(!window.__TRIAL__) return;
+  var grid = document.getElementById('chapterGrid');
+  if(grid){
+    var cards = grid.querySelectorAll('.chcard');
+    if(cards.length && window.__firstCh__ === null){
+      window.__firstCh__ = cards[0].getAttribute('data-ch');
+    }
+    cards.forEach(function(b, i){
+      if(i === 0) return; // 第一个章节开放
+      if(!b.classList.contains('locked')){
+        b.classList.add('locked');
+        b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); window.showTrialLock(); }, true);
+      }
+    });
+  }
+  ['revDue','revWeak','revAll'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && !el.classList.contains('locked')){
+      el.classList.add('locked');
+      el.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); window.showTrialLock(); }, true);
+    }
+  });
+};
+window.startTrialObserver = function(){
+  if(!window.__TRIAL__ || window.__trialObsStarted) return;
+  window.__trialObsStarted = true;
+  function run(){ window.applyTrialLocks(); }
+  var grid = document.getElementById('chapterGrid');
+  if(grid){
+    try{ new MutationObserver(run).observe(grid, {childList:true, subtree:true}); }catch(e){}
+    run();
+  } else {
+    var t = setInterval(function(){
+      var g = document.getElementById('chapterGrid');
+      if(g){ clearInterval(t); try{ new MutationObserver(run).observe(g, {childList:true, subtree:true}); }catch(e){} run(); }
+    }, 200);
+  }
+};
+(function(){ if(document.readyState !== 'loading'){ window.startTrialObserver(); } else { document.addEventListener('DOMContentLoaded', function(){ window.startTrialObserver(); }); } })();
+(function(){
+  if(document.getElementById('authTrialStyles')) return;
+  var s = document.createElement('style'); s.id = 'authTrialStyles';
+  s.textContent = '.chcard.locked{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}.chcard.locked::after{content:"🔒";position:absolute;top:8px;right:10px;font-size:16px}.chcard{position:relative}#revDue.locked,#revWeak.locked,#revAll.locked{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}#revDue.locked::before,#revWeak.locked::before,#revAll.locked::before{content:"🔒 ";}';
+  document.head.appendChild(s);
+})();
+/* ====================================================== */
+
+function renderChapters(){
+  const box=$("chapterGrid"); if(!box)return;
+  const isC = topMode==="cloze";
+  const newF = isC?cisNew:isNew;
+  const stF  = isC?cstatusOf:statusOf;
+  box.innerHTML=chaptersList().map(c=>{
+    const ids = isC ? c.ids.filter(id=>CLOZE_SET.has(id)) : c.ids;
+    const total=ids.length;
+    const learned=ids.filter(id=>!newF(id)).length;
+    const mastered=ids.filter(id=>stF(id)==="master").length;
+    const pct=total?Math.round(learned/total*100):0;
+    return `<button class="chcard" data-ch="${c.num}">
+      <div class="chn">Chapter ${c.num}</div>
+      <div class="cht">${esc(c.title)}</div>
+      <div class="chmeta">${total} 词 · 已学 ${learned} · 掌握 ${mastered}</div>
+      <div class="chbar"><i style="width:${pct}%"></i></div>
+    </button>`;
+  }).join("");
+  box.querySelectorAll(".chcard").forEach(b=>b.onclick=()=>{
+    if(topMode==="cloze"){
+      if(!DATA.some(d=>String(d.chNum)===String(b.dataset.ch)&&d.cloze)){alert("本章暂无可挖空的卡片");return;}
+      startSession("cloze:ch:"+b.dataset.ch,"studyArea");
+    } else startSession("ch:"+b.dataset.ch,"studyArea");
+  });
+}
+
+/* ---------- 选择卡片 ---------- */
+function pickCards(mode){
+  // 挖空练习：cloze:ch:X / cloze:all / cloze:due —— 按源顺序（不随机），只取有 cloze 的卡，进度用 CPROG 独立存储
+  if(typeof mode==="string" && mode.indexOf("cloze:")===0){
+    const sub=mode.slice(6);
+    if(sub==="due") return DATA.filter(d=>d.cloze&&cisDue(d.id)).map(d=>d.id);
+    if(sub.indexOf("ch:")===0){const n=parseInt(sub.slice(3),10);return DATA.filter(d=>d.chNum===n&&d.cloze).map(d=>d.id);}
+    return DATA.filter(d=>d.cloze).map(d=>d.id);
+  }
+  // 按章节学习：返回该章全部单词，不做数量裁剪
+  if(typeof mode==="string" && mode.indexOf("ch:")===0){
+    const n=parseInt(mode.slice(3),10);
+    return DATA.filter(d=>d.chNum===n).map(d=>d.id);
+  }
+  // 按个数学习：优先未掌握词（Phase5 易错优先），不足再补已掌握，按选定张数裁剪
+  if(typeof mode==="string" && mode.indexOf("count:")===0){
+    const n=parseInt(mode.slice(6),10);
+    const need=DATA.filter(d=>statusOf(d.id)!=="master").map(d=>d.id);
+    const rest=DATA.filter(d=>statusOf(d.id)==="master").map(d=>d.id);
+    let ids=weightedShuffle(need, wrongCount5).concat(shuffle(rest));
+    if(n>0 && n<ids.length) ids=ids.slice(0,n);
+    return ids;
+  }
+  // 复习待办：系统按遗忘曲线自动生成的到期卡，全部返回（不掺新词）；Phase5 易错优先排序
+  if(mode==="due"){
+    return weightedShuffle(DATA.filter(d=>isDue(d.id)).map(d=>d.id), wrongCount5);
+  }
+  // 专攻薄弱 / 全部过一遍：主动加练，按「本轮数量」裁剪；Phase5 易错优先排序（all 保持源顺序）
+  let ids;
+  if(mode==="new") ids=DATA.filter(d=>isNew(d.id)).map(d=>d.id);
+  else if(mode==="weak") ids=DATA.filter(d=>isWeak(d.id)).map(d=>d.id);
+  else if(mode==="all") ids=DATA.map(d=>d.id);
+  else ids=DATA.filter(d=>isDue(d.id)).map(d=>d.id);
+  if(mode!=="all") ids=weightedShuffle(ids, wrongCount5);
+  const n=getSessionSize();
+  if(n>0 && n<ids.length) ids=ids.slice(0,n);
+  return ids;
+}
+
+/* ---------- 学习会话 ---------- */
+let Q=[],QI=0,sessionDone=0,sessionMode="due",activeAreaId="",topMode="word";
+
+/* ---------- 多轮重来（Anki 式：失误重排，最多 MAX_RETRY 轮） ---------- */
+let SESS_TOTAL=0, SESS_PASSED=0;
+const RETRY_MAP={}; const MAX_RETRY=3; const REQ_GAP=3;   // 失误后隔几张再出现
+function onGrade(areaId,id,grade){
+  // 认识 → 本轮通过
+  if(grade==="good"){
+    SESS_PASSED++;
+    if(SESS_PASSED>=SESS_TOTAL){ finishSession(areaId); return; }
+    QI++; if(SESS_PASSED>=SESS_TOTAL || QI>=Q.length) finishSession(areaId); else renderCard(areaId);
+    return;
+  }
+  // 不认识 / 模糊 → 没过，重来（最多 MAX_RETRY 轮）
+  RETRY_MAP[id]=(RETRY_MAP[id]||0)+1;
+  if(RETRY_MAP[id]<=MAX_RETRY){
+    Q.splice(Math.min(QI+1+REQ_GAP, Q.length), 0, id);   // 隔几张再出现，避免机械重复
+  } else {
+    // 超过上限：放弃本轮重来，标记待巩固（rate 已置 relearning），计入已处理
+    SESS_PASSED++;
+    if(SESS_PASSED>=SESS_TOTAL){ finishSession(areaId); return; }
+  }
+  QI++; if(SESS_PASSED>=SESS_TOTAL || QI>=Q.length) finishSession(areaId); else renderCard(areaId);
+}
+
+/* 学习区视图切换：mode=选方式 / chapter=选章节 / count=选个数 / session=学习中 */
+function showStudyView(v){
+  $("studyModeSel").style.display  = v==="mode"    ? "" : "none";
+  $("studyChapter").style.display = v==="chapter" ? "" : "none";
+  $("studyCount").style.display   = v==="count"   ? "" : "none";
+  $("studyArea").style.display    = v==="session" ? "" : "none";
+}
+function backToMode(){ showStudyView("mode"); }
+function backToChapters(){ showStudyView("chapter"); }
+function backToCount(){ showStudyView("count"); }
+function backFromSession(){
+  if(activeAreaId==="studyArea"){
+    if(typeof sessionMode==="string" && (sessionMode.indexOf("ch:")===0 || sessionMode.indexOf("cloze:ch:")===0)) showStudyView("chapter");
+    else if(typeof sessionMode==="string" && sessionMode.indexOf("count:")===0) showStudyView("count");
+    else showStudyView("mode");
+  }
+  activeAreaId="";
+}
+function backFromReview(){ const m=$("reviewMenu"); if(m)m.style.display=""; $("reviewArea").style.display="none"; $("reviewArea").innerHTML=""; refresh(); }
+function startSession(mode,areaId){
+  if(window.__TRIAL__ && window.trialGuard && window.trialGuard(mode)){ window.showTrialLock(); return; }
+
+  sessionMode=mode;
+  activeAreaId=areaId;
+  Q=pickCards(mode); QI=0; sessionDone=0; SESS_TOTAL=Q.length; SESS_PASSED=0; for(const k in RETRY_MAP) delete RETRY_MAP[k];
+  if(Q.length===0){$(areaId).innerHTML='<div class="empty"><div class="big">🎉</div>暂时没有需要学习的卡片，去“词库”看看，或换个范围吧。</div>';return}
+  if(areaId==="studyArea") showStudyView("session");
+  if(areaId==="reviewArea"){const m=$("reviewMenu"); if(m)m.style.display="none"; $("reviewArea").style.display="";}
+  renderCard(areaId);
+}
+function renderCard(areaId){
+  const id=Q[QI];
+  const card=DATA.find(d=>d.id===id);
+  const total=SESS_TOTAL, left=SESS_TOTAL-SESS_PASSED;
+  if(typeof sessionMode==="string" && sessionMode.indexOf("cloze:")===0){
+    renderClozeCard(areaId, id, card, left, total);
+    return;
+  }
+  const lv=levelLabel(id);
+  const p=st(id);
+  let retP, nextTxt;
+  if(p.state==="new"){retP="—"; nextTxt="首次学习";}
+  else if(p.state==="relearning"){retP="需巩固"; nextTxt="明天再练";}
+  else { retP=Math.round(retention(id)*100)+"%"; const nd=daysBetween(todayStr(),p.due); nextTxt = nd<=0?"今天":nd+"天后"; }
+  let topLine;
+  if(areaId==="studyArea"){
+    const isCh = typeof sessionMode==="string" && sessionMode.indexOf("ch:")===0;
+    const backText = isCh ? "← 返回选章节" : "← 返回选个数";
+    topLine = `<div class="row" style="justify-content:space-between;width:100%;align-items:center;margin-bottom:6px">
+      <button class="btn ghost" style="font-size:12px;padding:7px 12px" onclick="backFromSession()">${backText}</button>
+      <span class="muted small">剩余 ${SESS_TOTAL-SESS_PASSED} / 共 ${SESS_TOTAL}</span>
+    </div>`;
+  } else if(areaId==="reviewArea"){
+    topLine = `<div class="row" style="justify-content:space-between;width:100%;align-items:center;margin-bottom:6px">
+      <button class="btn ghost" style="font-size:12px;padding:7px 12px" onclick="backFromReview()">← 返回复习选项</button>
+      <span class="muted small">剩余 ${SESS_TOTAL-SESS_PASSED} / 共 ${SESS_TOTAL}</span>
+    </div>`;
+  } else {
+    topLine = `<div class="muted small" style="width:100%;text-align:right">剩余 ${SESS_TOTAL-SESS_PASSED} / 共 ${SESS_TOTAL}</div>`;
+  }
+  $(areaId).innerHTML=`
+    <div class="progress"><i style="width:${Math.round(SESS_PASSED/SESS_TOTAL*100)}%"></i></div>
+    ${topLine}
+    <div class="stage">
+      <div class="flip" id="flip" role="button" tabindex="0" aria-label="翻转闪卡" onkeydown="if(event.key==='Enter'){event.preventDefault();this.click()}">
+        <div class="flip-in">
+          <div class="face front">
+            <div class="term">${esc(card.term)}</div>
+            <div class="hint">点击卡片 / 按空格 翻看定义（再点一次返回单词）</div>
+          </div>
+          <div class="face back">
+            <div class="tag">定义</div>
+            <div class="def">${esc(card.def)}</div>
+            <div class="meta">当前留存 ${retP} · 下次复习 ${nextTxt}</div>
+          </div>
+        </div>
+      </div>
+      <div class="ratings" id="ratings" style="visibility:hidden">
+        <button class="btn bad" data-q="again">不认识</button>
+        <button class="btn warn" data-q="hard">模糊</button>
+        <button class="btn good" data-q="good">认识</button>
+      </div>
+    </div>`;
+  const flip=$(areaId).querySelector("#flip");
+  if(flip){
+    flip.onclick=()=>{const f=flip.classList.toggle("flipped");const r=$(areaId).querySelector("#ratings"); if(r)r.style.visibility=f?"visible":"hidden"};
+  }
+  const rt=$(areaId).querySelector("#ratings");
+  if(rt){
+    rt.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      rate(id,b.dataset.q);
+      onGrade(areaId,id,b.dataset.q);
+    });
+  }
+}
+/* ---------- 挖空练习卡片渲染 ---------- */
+function renderClozeCard(areaId, id, card, left, total){
+  const cp=cst(id);
+  let retP, nextTxt;
+  if(cp.state==="new"){retP="—"; nextTxt="首次练习";}
+  else if(cp.state==="relearning"){retP="需巩固"; nextTxt="明天再练";}
+  else { const dt=Math.max(0,daysBetween(cp.last,todayStr())); retP=Math.round(Math.exp(-K_DECAY*dt/Math.max(0.1,cp.S||0.1))*100)+"%"; const nd=daysBetween(todayStr(),cp.due); nextTxt = nd<=0?"今天":nd+"天后"; }
+  const backText = (typeof sessionMode==="string" && sessionMode.indexOf("cloze:ch:")===0) ? "← 返回选章节" : "← 返回选择学习方式";
+  const clozeHtml = (card.cloze||card.def)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\[\[(.+?)\]\]/g,'<span class="cloze" data-w="$1">_____</span>');
+  $(areaId).innerHTML=`
+    <div class="progress"><i style="width:${Math.round(SESS_PASSED/SESS_TOTAL*100)}%"></i></div>
+    <div class="row" style="justify-content:space-between;width:100%;align-items:center;margin-bottom:6px">
+      <button class="btn ghost" style="font-size:12px;padding:7px 12px" onclick="backFromSession()">${backText}</button>
+      <span class="muted small">剩余 ${SESS_TOTAL-SESS_PASSED} / 共 ${SESS_TOTAL}</span>
+    </div>
+    <div class="stage">
+      <div class="cloze-card cloze-face" role="button" tabindex="0" aria-label="显示挖空答案" onkeydown="if(event.key==='Enter'){event.preventDefault();this.click()}">
+        <div class="ctag">挖空练习 · 提示词</div>
+        <div class="cterm">${esc(card.term)}</div>
+        <div class="cloze-def">${clozeHtml}</div>
+        <div class="cmeta">当前留存 ${retP} · 下次复习 ${nextTxt}</div>
+        <div class="chint">读定义，回忆被遮住的词；点击卡片 / 按空格 揭示答案</div>
+      </div>
+      <div class="ratings" id="ratings">
+        <button class="btn bad" data-q="again">不认识</button>
+        <button class="btn warn" data-q="hard">模糊</button>
+        <button class="btn good" data-q="good">认识</button>
+      </div>
+    </div>`;
+  const face=$(areaId).querySelector(".cloze-face");
+  let revealed=false;
+  const reveal=()=>{
+    if(revealed) return;
+    revealed=true;
+    face.querySelectorAll(".cloze").forEach(s=>{ s.textContent=s.dataset.w; s.classList.add("revealed"); });
+    const r=$(areaId).querySelector("#ratings"); if(r) r.style.visibility="visible";
+  };
+  if(face){ face.onclick=(e)=>{ if(e.target.closest(".ratings")) return; reveal(); }; }
+  const rt=$(areaId).querySelector("#ratings");
+  if(rt){
+    rt.style.visibility="hidden";
+    rt.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      crate(id,b.dataset.q);
+      onGrade(areaId,id,b.dataset.q);
+    });
+  }
+}
+function sessionChName(mode){
+  if(typeof mode!=="string") return "未选择章节";
+  let chPart="";
+  if(mode.indexOf("cloze:ch:")===0) chPart=mode.slice(9);
+  else if(mode.indexOf("ch:")===0) chPart=mode.slice(3);
+  if(!chPart) return "全库模式";
+  const n=Number(chPart);
+  if(!isNaN(n)){
+    const c=chaptersList().find(x=>x.num===n);
+    return (c && c.title) ? c.title : `Chapter ${chPart}`;
+  }
+  const groups=chaptersList();
+  for(const g of groups){
+    if(g.subs){
+      for(const s of g.subs){
+        if(String(s.key)===chPart) return (s.title) ? s.title : chPart;
+      }
+    }
+  }
+  return chPart;
+}
+function finishSession(areaId){
+  const learned=(SESS_TOTAL>0)?SESS_TOTAL:Q.length;
+  const reReview=Object.keys(RETRY_MAP).filter(k=>RETRY_MAP[k]>0).length;
+  const chName=sessionChName(sessionMode);
+  const justChecked=autoCheckin();          // 完成学习 → 自动打卡（仅记录当天）
+  const s=streak();
+  const chkTxt=justChecked?"✅ 今日打卡已自动记录":"📅 今日已打卡";
+  const streakTxt=s.cur>0?` · 连续 ${s.cur} 天`:"";
+  let backBtns="";
+  if(areaId==="studyArea"){
+    const isCh = typeof sessionMode==="string" && (sessionMode.indexOf("ch:")===0 || sessionMode.indexOf("cloze:")===0);
+    backBtns = isCh
+      ? `<button class="btn soft" onclick="backToChapters()">返回选章节</button>`
+      : `<button class="btn soft" onclick="backToCount()">返回选个数</button>`;
+    backBtns += `<button class="btn ghost" onclick="backToMode()">返回选择学习方式</button>`;
+  } else if(areaId==="reviewArea"){
+    backBtns = `<button class="btn soft" onclick="backFromReview()">返回复习选项</button>`;
+  }
+  $(areaId).innerHTML=`<div class="sum">
+    <div class="big">本轮完成 🎉</div>
+    <p class="muted">章节：${chName}</p>
+    <p class="muted">已学习 ${learned} 张 · ${todayStr()} · 进度已自动保存</p>
+    ${reReview>0?`<p class="muted" style="color:#c0392b">其中 ${reReview} 张需多练几轮，已加入待巩固</p>`:""}
+    <div class="chkline">${chkTxt}${streakTxt}</div>
+    <div class="row" style="justify-content:center;margin-top:10px;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="startSession(sessionMode,'${areaId}')">再来一组</button>
+      ${backBtns}
+      <button class="btn ghost" onclick="switchTab('checkin')">查看打卡</button>
+    </div></div>`;
+  if(window.Sync)Sync.push();
+  refresh();
+}
+function returnToChapters(){ showStudyView("chapter"); }
+let currentMode="due";
+
+/* ---------- 渲染：统计 ---------- */
+function refresh(){
+  $("totalN").textContent=DATA.length;
+  const due=DATA.filter(d=>isDue(d.id)).length;
+  const master=DATA.filter(d=>statusOf(d.id)==="master").length;
+  const s=streak();
+  $("streakN").textContent=s.cur;
+  $("dueN").textContent=due;
+  $("masterN").textContent=master;
+  $("todayStr").textContent=todayStr();
+  const weak=DATA.filter(d=>isWeak(d.id)).length;
+  $("rDue").textContent=due;
+  $("rNew").textContent=DATA.filter(d=>isNew(d.id)).length;
+  $("rWeak").textContent=weak;
+  ["revDueN","revDueN2"].forEach(k=>{const el=$(k);if(el)el.textContent=due;});
+  const rw=$("revWeakN"); if(rw)rw.textContent=weak;
+  $("cCur").textContent=s.cur; $("cBest").textContent=s.best; $("cTot").textContent=s.tot;
+  const tc=$("todayChk"); if(tc){ if(CHK.includes(todayStr())){tc.textContent="今日已打卡 ✓";tc.className="pill good";}else{tc.textContent="今日未打卡 · 去学习后自动记录";tc.className="pill idle";} }
+  renderChapters();
+  renderCal();
+  $("sNew").textContent=DATA.filter(d=>statusOf(d.id)==="new").length;
+  $("sLearn").textContent=DATA.filter(d=>statusOf(d.id)==="learn").length;
+  $("sMaster").textContent=master;
+  $("sDue").textContent=due;
+  renderDonut();
+  renderAct();
+  renderRet();
+  renderBrowse();
+}
+let calY=(new Date()).getFullYear(), calM=(new Date()).getMonth();
+function renderCal(){
+  const y=calY, m=calM;
+  $("calTitle").textContent=`${y} 年 ${m+1} 月`;
+  const first=new Date(y,m,1); const startD=first.getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const wl=["日","一","二","三","四","五","六"];
+  let h=""; wl.forEach(w=>h+=`<div class="d h">${w}</div>`);
+  for(let i=0;i<startD;i++)h+=`<div class="d"></div>`;
+  const t=todayStr();
+  for(let d=1;d<=days;d++){
+    const ds=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const on=CHK.includes(ds)?" on":""; const tod=ds===t?" today":"";
+    h+=`<div class="d${on}${tod}">${d}</div>`;
+  }
+  $("cal").innerHTML=h;
+}
+function calPrev(){ calM--; if(calM<0){calM=11;calY--;} renderCal(); }
+function calNext(){ calM++; if(calM>11){calM=0;calY++;} renderCal(); }
+function calToday(){ const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); renderCal(); }
+function renderDonut(){
+  const n=DATA.filter(d=>statusOf(d.id)==="new").length;
+  const l=DATA.filter(d=>statusOf(d.id)==="learn").length;
+  const m=DATA.filter(d=>statusOf(d.id)==="master").length;
+  const segs=[["新词",n,"#c9d2e6"],["学习中",l,"#e8833a"],["已掌握",m,"#27a567"]];
+  const total=DATA.length||1; let acc=0,r=54,cx=70,cy=70;
+  let p="";
+  segs.forEach(([nm,v,col])=>{const a0=acc/total*2*Math.PI-Math.PI/2;acc+=v;
+    const a1=acc/total*2*Math.PI-Math.PI/2;
+    if(v>0){const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+      const large=(a1-a0)>Math.PI?1:0;
+      p+=`<path d="M${cx} ${cy} L${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z" fill="${col}"/>`}});
+  p+=`<circle cx="${cx}" cy="${cy}" r="34" fill="#fff"/>`;
+  p+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="20" font-weight="800" fill="#1f2733">${m}</text>`;
+  p+=`<text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="11" fill="#6b7686">已掌握</text>`;
+  $("donut").innerHTML=p;
+  $("legend").innerHTML=segs.map(([nm,v,col])=>`<div><i style="background:${col}"></i>${nm}：${v}</div>`).join("");
+}
+function renderAct(){
+  const days=[];for(let i=13;i>=0;i--)days.push(addDays(todayStr(),-i));
+  const max=Math.max(1,...days.map(d=>STAT[d]||0));
+  $("actBars").innerHTML=days.map(d=>{const v=STAT[d]||0;const h=Math.round(v/max*100);
+    const on=CHK.includes(d)?"style='background:#19b8a6'":"";
+    return `<div class="b" ${on} style="height:${Math.max(3,h)}%"><span>${v||""}</span><small>${d.slice(5)}</small></div>`}).join("");
+}
+function renderRet(){
+  const S0=12, W=300,H=120, pad=26;
+  const maxT=30;
+  const X=t=> pad + t/maxT*(W-pad-10);
+  const Y=r=> H-pad - r*(H-pad-12);
+  let path="";
+  for(let t=0;t<=maxT;t+=0.5){const r=Math.exp(-K_DECAY*t/S0);path+=(t===0?"M":"L")+X(t).toFixed(1)+" "+Y(r).toFixed(1)+" ";}
+  const sx=X(S0), sy=Y(0.9);
+  $("retCurve").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px">
+    <line x1="${pad}" y1="${H-pad}" x2="${W-10}" y2="${H-pad}" stroke="#e6eaf2"/>
+    <line x1="${pad}" y1="10" x2="${pad}" y2="${H-pad}" stroke="#e6eaf2"/>
+    <path d="${path}" fill="none" stroke="#4f6ef7" stroke-width="2.5"/>
+    <circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="4" fill="#19b8a6"/>
+    <text x="${(sx+4).toFixed(1)}" y="${(sy-6).toFixed(1)}" font-size="10" fill="#19b8a6">复习点(留存90%)</text>
+    <text x="${pad}" y="9" font-size="10" fill="#6b7686">留存率</text>
+    <text x="${W-30}" y="${H-8}" font-size="10" fill="#6b7686">天数</text>
+  </svg>`;
+  const rev=DATA.filter(d=>!isNew(d.id));
+  const avg= rev.length? Math.round(rev.reduce((a,d)=>a+retention(d.id),0)/rev.length*100):100;
+  $("sRet").textContent=avg+"%";
+}
+
+/* ---------- 词库 ---------- */
+let bFilter="all", bSearch="";
+function renderBrowse(){
+  let arr=DATA.slice();
+  if(bFilter==="new")arr=arr.filter(d=>statusOf(d.id)==="new");
+  else if(bFilter==="learn")arr=arr.filter(d=>statusOf(d.id)==="learn");
+  else if(bFilter==="master")arr=arr.filter(d=>statusOf(d.id)==="master");
+  else if(bFilter==="due")arr=arr.filter(d=>isDue(d.id));
+  if(bSearch)arr=arr.filter(d=>(d.term+" "+d.def).toLowerCase().includes(bSearch.toLowerCase()));
+  const el=$("bList");
+  if(arr.length===0){el.innerHTML='<div class="empty">没有匹配的卡片</div>';return}
+  let lockedTail="";
+  if(window.__TRIAL__ && arr.length>20){
+    var hiddenN=arr.length-20;
+    arr=arr.slice(0,20);
+    lockedTail='<div class="item" style="cursor:pointer" onclick="if(window.showTrialLock)window.showTrialLock()">'
+      +'<div class="t"><span>还有 '+hiddenN+' 个词条未解锁</span><span class="lvl n">未解锁</span></div>'
+      +'<div class="dd" style="color:#e0524e">联系管理员 VX: Donna-CYF 获取整套服务</div></div>';
+  }
+  el.innerHTML=arr.map(d=>{const lv=levelLabel(d.id);
+    return `<div class="item" role="button" tabindex="0" onclick="this.classList.toggle('open')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.click()}">
+      <div class="t"><span>${esc(d.term)}</span><span class="lvl ${lv[1]}">${lv[0]}</span></div>
+      <div class="dd">${esc(d.def)}</div></div>`}).join("")+lockedTail;
+}
+
+/* ---------- 转义 ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* ---------- Tab ---------- */
+function switchTab(name){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="p-"+name));
+  if(name==="study") showStudyView("mode");   // 进入学习页 → 回到“选择学习方式”
+  if(name==="review"){ const m=$("reviewMenu"); if(m)m.style.display=""; const ra=$("reviewArea"); if(ra){ra.style.display="none"; ra.innerHTML="";} }
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+/* ---------- 事件 ---------- */
+$("sessionSize2").onchange=e=>setSessionSize(parseInt(e.target.value,10));
+$("revDue").onclick=()=>startSession("due","reviewArea");
+$("revWeak").onclick=()=>startSession("weak","reviewArea");
+$("revAll").onclick=()=>startSession("all","reviewArea");
+// 学习方式选择
+document.querySelectorAll('#studyModeSel [data-mode]').forEach(b=>b.onclick=()=>{
+  const m=b.dataset.mode;
+  topMode = (m==="cloze") ? "cloze" : "word";
+  renderChapters();
+  showStudyView(m==="count" ? "count" : "chapter");
+});
+// 按个数学习
+document.querySelectorAll('#studyCount [data-count]').forEach(b=>b.onclick=()=>startSession("count:"+b.dataset.count,"studyArea"));
+$("search").oninput=e=>{bSearch=e.target.value;renderBrowse()};
+document.querySelectorAll("#bFilters .chip").forEach(c=>c.onclick=()=>{
+  document.querySelectorAll("#bFilters .chip").forEach(x=>x.classList.remove("active"));
+  c.classList.add("active");bFilter=c.dataset.f;renderBrowse();
+});
+$("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify({deck:DECK_SLUG,version:2,PROG,CPROG,CHK,STAT},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="vwords_progress_"+todayStr()+".json";a.click();toast("已导出进度");
+};
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result);
+    if(o.deck&&o.deck!==DECK_SLUG)throw new Error("deck_mismatch");
+    if(o.PROG){PROG=o.PROG;for(const id in PROG)PROG[id]=migrate(PROG[id]);save(K_PROG,PROG);}
+    if(o.CPROG){CPROG=o.CPROG;save(K_CPROG,CPROG);}
+    if(o.CHK){CHK=o.CHK;save(K_CHK,CHK);}
+    if(o.STAT){STAT=o.STAT;save(K_STAT,STAT);}
+    refresh();if(window.Sync)Sync.push();toast("进度已导入");}catch(err){toast(err.message==="deck_mismatch"?"备份属于其他套卡":"文件格式错误")}};
+  r.readAsText(f)};
+$("resetBtn").onclick=()=>{if(confirm("确定要清空所有学习进度和打卡记录吗？")){
+  PROG={};CPROG={};CHK=[];STAT={};save(K_PROG,PROG);save(K_CPROG,CPROG);save(K_CHK,CHK);save(K_STAT,STAT);if(window.Sync)Sync.resetCloud().catch(()=>toast("本地已重置，云端清除失败"));refresh();toast("已重置");}};
+
+/* ---------- 键盘 ---------- */
+document.addEventListener("keydown",e=>{
+  if(e.target&&e.target.closest&&e.target.closest('input,textarea,select,button,[contenteditable="true"]'))return;
+  const ps=$("p-study"), pr=$("p-review");
+  let panel=null;
+  if(ps&&ps.classList.contains("active"))panel=ps;
+  else if(pr&&pr.classList.contains("active"))panel=pr;
+  if(!panel)return;
+  const flip=panel.querySelector("#flip");
+  if(!flip){
+    const cf=panel.querySelector(".cloze-face"); if(!cf)return;
+    if(e.code==="Space"){e.preventDefault();cf.click();}
+    const rt=panel.querySelector("#ratings");
+    if(rt && rt.style.visibility==="visible"){
+      if(e.key==="1")rt.querySelector('[data-q=again]').click();
+      if(e.key==="2")rt.querySelector('[data-q=hard]').click();
+      if(e.key==="3")rt.querySelector('[data-q=good]').click();
+    }
+    return;
+  }
+  if(e.code==="Space"){e.preventDefault();flip.click();}
+  if(flip.classList.contains("flipped")){
+    const rt=panel.querySelector("#ratings"); if(!rt)return;
+    if(e.key==="1")rt.querySelector('[data-q=again]').click();
+    if(e.key==="2")rt.querySelector('[data-q=hard]').click();
+    if(e.key==="3")rt.querySelector('[data-q=good]').click();
+  }
+});
+
+/* ---------- 初始化 ---------- */
+if (typeof AuthGate !== "undefined") {
+  AuthGate.start({
+    deck: DECK_SLUG,
+    onSuccess: function(){
+      var after = function(){ $("sessionSize2").value=String(getSessionSize()); refresh(); };
+      if (window.Sync) { Sync.init(DECK_SLUG); Sync.pull().finally(after); }
+      else after();
+    }
+  });
+} else {
+  // 登录脚本未加载时仍保持受限试用，避免因网络/CDN 故障解锁全部内容
+  window.__TRIAL__=true;
+  if(typeof window.startTrialObserver==="function")window.startTrialObserver();
+  $("sessionSize2").value=String(getSessionSize());
+  refresh();
+}
+</script>
+<script src="data-corrections.js"></script>
+<script>
+// Phase5：复习页提示「易错优先」
+(function(){
+  var rm=document.getElementById('reviewMenu');
+  if(rm && !document.getElementById('p5hint')){
+    var d=document.createElement('div');
+    d.id='p5hint'; d.className='pill idle';
+    d.style.margin='0 0 14px'; d.style.fontSize='13px';
+    d.textContent='\u2696 \u6613\u9519\u4f18\u5148\uff1a\u9519\u5f97\u8d8a\u591a\u7684\u8bcd\u8d8a\u6392\u5230\u524d\u9762\u3001\u88ab\u4f18\u5148\u62bd\u5230\uff08\u6309\u4f60\u7684\u9519\u8bef\u6b21\u6570\u52a0\u6743\uff09\u3002';
+    rm.insertBefore(d, rm.firstChild);
+  }
+})();
+</script>
+</body>
+</html>
